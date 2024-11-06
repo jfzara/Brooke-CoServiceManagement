@@ -1,0 +1,153 @@
+.titreCalendrier { 
+  margin-top: 3rem;
+}
+
+.header {
+  background-color: #ffffff;
+  height: 6rem;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.app-container {
+  display: flex;
+  margin-top: 30px;
+  background-color: #f0f0f0;
+}
+
+.sidebar {
+  width: 10rem;
+  height: calc(100vh - 30px);
+  background-color: #123456;
+  color: #ffffff;
+  padding: 20px 10px;
+  position: fixed;
+  top: 30px;
+}
+
+.sidebar h2 {
+  font-size: 1.2em;
+}
+
+.sidebar nav ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar nav a {
+  color: white;
+  text-decoration: none;
+}
+
+.main-content {
+  margin-left: 12rem;
+  padding: 20px;
+  width: 100%;
+  margin-top: 4rem;
+}
+
+.interventions {
+  padding: 20px;
+}
+
+.titreInterventions {
+  margin-bottom: 5rem;
+}
+
+.filter-form {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3rem;
+}
+
+#filter-select {
+  border-radius: 4px;
+  border: none;
+  height: 2rem;
+}
+
+.filter-form label {
+  margin-right: 5px;
+}
+
+.add-button {
+  background-color: #FFD700;
+  border-radius: 4px;
+  padding: 10px 20px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  color: black;
+  margin-left: 10px;
+}
+
+.search-bar {
+  margin-top: 6rem;
+  width: 50vw;
+  margin-bottom: 4rem; 
+  height: 2rem;
+  border-radius: 4px;
+  border: none;
+}
+
+.interventions-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+.interventions-table th,
+.interventions-table td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+.status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 4px;
+  margin: auto;
+  font-size: 1rem;
+}
+
+.status1 {
+  background-color: #4caf50;
+  color: white; 
+}
+
+.status2 {
+  background-color: #e63946;
+  color: white; 
+}
+
+.status3 {
+  background-color: #ffeb3b;
+}
+
+.action-button {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 1rem;
+  color: white;
+  margin-right: 2rem;
+  border: none;
+}
+
+.action-green {
+  background-color: #4caf50;
+}
+
+.action-yellow {
+  background-color: #FFD700;
+  color: black;
+}
+
+.action-red {
+  background-color: #e63946;
+}

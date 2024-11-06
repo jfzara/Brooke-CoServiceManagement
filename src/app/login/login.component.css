@@ -1,0 +1,152 @@
+/* src/app/login/login.component.css */
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: white;
+}
+
+.navbar {
+    background-color: rgb(31, 92, 137, 0.82);
+    color: white;
+    width: 100%;
+    padding: 15px;
+    display: flex;
+    justify-content: space-around;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.navbar-title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.navbar-item {
+    cursor: pointer;
+}
+
+.login-box {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    width: 31.5vw;
+    height: 40vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-top: 15vh;
+    z-index: 1;
+}
+
+.form-field {
+    width: 95%;
+    margin-bottom: 15px;
+}
+
+.form-field label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-field input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.login-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #004eff;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 3vh;
+}
+
+.social-login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.or-text,
+h2 {
+    color: black;
+    font-weight: 500;
+    margin: 10px 0;
+    text-align: center;
+    margin-top: 1vh;
+}
+
+.social-button {
+    width: 100%;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-bottom: 2vh;
+}
+
+.google-button {
+    background-color: #4285F4;
+}
+
+.facebook-button {
+    background-color: #e63946;
+}
+
+.banner-container {
+    display: flex;
+    gap: 1rem;
+    width: 100vw;
+    height: 28vh;
+    overflow: hidden;
+    position: relative;
+    top: 9%;
+    opacity: 0.6;
+}
+
+.banner-container img {
+    width: calc(33.33% - 0.66rem);
+    height: 100%;
+    object-fit: cover;
+}
+
+.banner-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 100%, rgba(0, 0, 0, 0) 10%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.footer {
+    background-color: rgb(31, 92, 137, 0.82);
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+}
