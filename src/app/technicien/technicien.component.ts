@@ -6,13 +6,13 @@ import interactionPlugin from '@fullcalendar/interaction'; // Importez le plugin
 import frLocale from '@fullcalendar/core/locales/fr'; // Importez la locale française
 
 @Component({
-  selector: 'app-prepose',
+  selector: 'app-technicien',
   standalone: true,
   imports: [FullCalendarModule], // Ajoutez FullCalendarModule ici
-  templateUrl: './prepose.component.html',
-  styleUrls: ['./prepose.component.css']
+  templateUrl: './technicien.component.html',
+  styleUrls: ['./technicien.component.css']
 })
-export class PreposeComponent {
+export class TechnicienComponent {  // Changez le nom en TechnicienComponent (utilisez la bonne casse)
   calendarOptions: CalendarOptions = {
     locale: frLocale,  // Utilisez la locale française
     plugins: [dayGridPlugin, interactionPlugin],  // Ajoutez les plugins nécessaires
