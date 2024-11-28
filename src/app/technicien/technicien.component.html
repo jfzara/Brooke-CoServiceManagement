@@ -1,92 +1,99 @@
-<div class="header"></div>
+<div class="header">
+  <h1 class="header-title">Dashboard Technicien</h1>
+</div>
 
 <div class="app-container">
   <aside class="sidebar">
     <h2>Brooke & Co</h2>
     <nav>
       <ul>
-        <li><a href="#">Lien 1</a></li>
-        <li><a href="#">Lien 2</a></li>
-        <li><a href="#">Lien 3</a></li>
+        <li><a href="#interventions">Mes Interventions</a></li>
+        <li><a href="#calendar">Mon Planning</a></li>
       </ul>
     </nav>
   </aside>
 
   <main class="main-content">
-    <section class="interventions">
-      <div>
-        <h2 class="titreInterventions">Interventions</h2>
-      </div>
-      <div class="filter-form">
-        <div>
-          <label for="filter-select">Filtrer par :</label>
-          <select id="filter-select">
-            <option value=""></option>
-            <option value="filter1">InterventionID</option>
-            <option value="filter2">Client</option>
-            <option value="filter3">Date</option>
-          </select>
+    <section id="interventions" class="interventions">
+      <div class="section-header">
+        <h2>Mes Interventions</h2>
+        <div class="controls">
+          <div class="search-container">
+            <input 
+              type="text" 
+              class="search-bar" 
+              placeholder="Rechercher une intervention..." 
+              (input)="onSearch($event)"
+            />
+          </div>
+          <div class="filter-container">
+            <select (change)="onFilterChange($event)" class="filter-select">
+              <option value="">Tous les statuts</option>
+              <option value="pending">{{STATUS_TYPES.PENDING}}</option>
+              <option value="inProgress">{{STATUS_TYPES.IN_PROGRESS}}</option>
+              <option value="completed">{{STATUS_TYPES.COMPLETED}}</option>
+            </select>
+          </div>
         </div>
-        <button class="add-button">Visualiser mes statistiques</button>
       </div>
-      <input type="text" class="search-bar" placeholder="Recherche..." />
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Heure</th>
+              <th>Client</th>
+              <th>Type d'intervention</th>
+              <th>Description</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let intervention of filteredInterventions">
+              <td>{{intervention.DebutIntervention | date:'dd/MM/yyyy'}}</td>
+              <td>{{intervention.DebutIntervention | date:'HH:mm'}} - {{intervention.FinIntervention | date:'HH:mm'}}</td>
+              <td>Client {{intervention.ClientID}}</td>
+              <td>{{intervention.TypeIntervention}}</td>
+              <td>{{intervention.Description}}</td>
+              <td>
+                <span class="status" [ngClass]="{
+                  'status-pending': intervention.StatutIntervention === STATUS_TYPES.PENDING,
+                  'status-progress': intervention.StatutIntervention === STATUS_TYPES.IN_PROGRESS,
+                  'status-completed': intervention.StatutIntervention === STATUS_TYPES.COMPLETED
+                }">
+                  {{intervention.StatutIntervention}}
+                </span>
+              </td>
+              <td class="actions">
+                <button 
+                  class="action-button start-button" 
+                  *ngIf="intervention.StatutIntervention === STATUS_TYPES.PENDING"
+                  (click)="startIntervention(intervention)">
+                  Démarrer
+                </button>
+                <button 
+                  class="action-button complete-button" 
+                  *ngIf="intervention.StatutIntervention === STATUS_TYPES.IN_PROGRESS"
+                  (click)="completeIntervention(intervention)">
+                  Terminer
+                </button>
+                <button 
+                  class="action-button cancel-button"
+                  *ngIf="intervention.StatutIntervention !== STATUS_TYPES.COMPLETED"
+                  (click)="cancelIntervention(intervention)">
+                  Annuler
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
-    <section class="interventions-table">
-      <table>
-        <thead>
-          <tr>
-            <th>InterventionID</th>
-            <th>Client</th>
-            <th>Date-Création</th>
-            <th>Statut</th>
-            <th>Inconnu</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>001</td>
-            <td>Client X</td>
-            <td>2023-11-05</td>
-            <td><span class="status status1">En cours</span></td>
-            <td>-</td>
-            <td>
-              <button class="action-button action-green">Bouton 1</button>
-              <button class="action-button action-yellow">Bouton 2</button>
-              <button class="action-button action-red">Bouton 3</button>
-            </td>
-          </tr>
-          <tr>
-            <td>002</td>
-            <td>Client Y</td>
-            <td>2023-11-06</td>
-            <td><span class="status status2">Retardé</span></td>
-            <td>-</td>
-            <td>
-              <button class="action-button action-green">Bouton 1</button>
-              <button class="action-button action-yellow">Bouton 2</button>
-              <button class="action-button action-red">Bouton 3</button>
-            </td>
-          </tr>
-          <tr>
-            <td>003</td>
-            <td>Client Z</td>
-            <td>2023-11-07</td>
-            <td><span class="status status3">Terminé</span></td>
-            <td>-</td>
-            <td>
-              <button class="action-button action-green">Bouton 1</button>
-              <button class="action-button action-yellow">Bouton 2</button>
-              <button class="action-button action-red">Bouton 3</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="calendar">
-      <h2 class="titreCalendrier">Calendrier des interventions</h2>
+    <section id="calendar" class="calendar">
+      <h2>Mon Planning</h2>
       <full-calendar [options]="calendarOptions"></full-calendar>
     </section>
   </main>

@@ -172,11 +172,11 @@
         
             // Données clients fictives
             $clients = [
-                ['Adresse' => '123 Rue Principale', 'Telephone' => '0123456789', 'Demandes' => 'Nettoyage', 'UtilisateurID' => 1],
-                ['Adresse' => '456 Avenue de la République', 'Telephone' => '0987654321', 'Demandes' => 'Réparation', 'UtilisateurID' => 5],
-                ['Adresse' => '789 Boulevard des Capucines', 'Telephone' => '0147258369', 'Demandes' => 'Maintenance', 'UtilisateurID' => 1],
-                ['Adresse' => '321 Place de la Concorde', 'Telephone' => '0178346952', 'Demandes' => 'Installation', 'UtilisateurID' => 5],
-                ['Adresse' => '654 Rue de Rivoli', 'Telephone' => '0192837465', 'Demandes' => 'Inspection', 'UtilisateurID' => 1]
+                ['Adresse' => '123 Rue Principale', 'Telephone' => '0123456789', 'Demandes' => 'Installation Fibre', 'UtilisateurID' => 1],
+                ['Adresse' => '456 Avenue de la République', 'Telephone' => '0987654321', 'Demandes' => 'Support Internet', 'UtilisateurID' => 5],
+                ['Adresse' => '789 Boulevard des Capucines', 'Telephone' => '0147258369', 'Demandes' => 'Configuration Réseau', 'UtilisateurID' => 1],
+                ['Adresse' => '321 Place de la Concorde', 'Telephone' => '0178346952', 'Demandes' => 'Maintenance Box', 'UtilisateurID' => 5],
+                ['Adresse' => '654 Rue de Rivoli', 'Telephone' => '0192837465', 'Demandes' => 'Dépannage Internet', 'UtilisateurID' => 1]
             ];
         
             foreach ($clients as $client) {
@@ -194,10 +194,6 @@
         
             // Données techniciens fictives
             $techniciens = [
-                ['UtilisateurID' => 2],
-                ['UtilisateurID' => 2],
-                ['UtilisateurID' => 2],
-                ['UtilisateurID' => 2],
                 ['UtilisateurID' => 2]
             ];
         
@@ -209,57 +205,107 @@
                 $stmt->close();
             }
         
-            // Données interventions fictives
+            // Nouvelles données interventions télécoms
             $interventions = [
                 [
                     'TechnicienID' => 2,
                     'ClientID' => 1,
-                    'TypeIntervention' => 'Réparation',
-                    'Description' => 'Réparation de la machine X',
-                    'DebutIntervention' => '2024-10-29 10:00:00',
-                    'FinIntervention' => '2024-10-29 11:00:00',
+                    'TypeIntervention' => 'Installation Fibre',
+                    'Description' => 'Installation fibre optique + configuration box',
+                    'DebutIntervention' => '2024-11-05 09:00:00',
+                    'FinIntervention' => '2024-11-05 11:00:00',
                     'StatutIntervention' => 'En attente',
-                    'Commentaires' => 'Urgent'
+                    'Commentaires' => 'Client prioritaire - Nouveau raccordement'
                 ],
                 [
                     'TechnicienID' => 2,
-                    'ClientID' => 1,
-                    'TypeIntervention' => 'Maintenance',
-                    'Description' => 'Maintenance du système Y',
-                    'DebutIntervention' => '2024-10-30 14:00:00',
-                    'FinIntervention' => '2024-10-30 15:00:00',
-                    'StatutIntervention' => 'En cours',
-                    'Commentaires' => 'Routine'
+                    'ClientID' => 3,
+                    'TypeIntervention' => 'Dépannage Internet',
+                    'Description' => 'Perte de connexion intermittente - Diagnostic ligne',
+                    'DebutIntervention' => '2024-11-12 14:00:00',
+                    'FinIntervention' => '2024-11-12 16:00:00',
+                    'StatutIntervention' => 'En attente',
+                    'Commentaires' => 'Problème récurrent depuis 3 jours'
                 ],
                 [
                     'TechnicienID' => 2,
-                    'ClientID' => 1,
-                    'TypeIntervention' => 'Installation',
-                    'Description' => 'Installation du dispositif Z',
-                    'DebutIntervention' => '2024-10-31 09:00:00',
-                    'FinIntervention' => '2024-10-31 10:00:00',
-                    'StatutIntervention' => 'Terminé',
-                    'Commentaires' => 'Nécessite vérification'
+                    'ClientID' => 2,
+                    'TypeIntervention' => 'Installation Box',
+                    'Description' => 'Remplacement box défectueuse + migration WiFi 6',
+                    'DebutIntervention' => '2024-11-19 10:00:00',
+                    'FinIntervention' => '2024-11-19 12:00:00',
+                    'StatutIntervention' => 'En attente',
+                    'Commentaires' => 'Box prête en agence'
+                ],
+                [
+                    'TechnicienID' => 2,
+                    'ClientID' => 4,
+                    'TypeIntervention' => 'Maintenance Réseau',
+                    'Description' => 'Optimisation réseau local + test débit',
+                    'DebutIntervention' => '2024-11-26 13:00:00',
+                    'FinIntervention' => '2024-11-26 15:00:00',
+                    'StatutIntervention' => 'En attente',
+                    'Commentaires' => 'Ralentissements signalés'
                 ],
                 [
                     'TechnicienID' => 2,
                     'ClientID' => 5,
-                    'TypeIntervention' => 'Inspection',
-                    'Description' => 'Inspection de la machine A',
-                    'DebutIntervention' => '2024-11-01 11:00:00',
-                    'FinIntervention' => '2024-11-01 12:00:00',
+                    'TypeIntervention' => 'Configuration Réseau',
+                    'Description' => 'Paramétrage réseau entreprise + VPN',
+                    'DebutIntervention' => '2024-12-03 09:00:00',
+                    'FinIntervention' => '2024-12-03 12:00:00',
                     'StatutIntervention' => 'En attente',
-                    'Commentaires' => 'Préventif'
+                    'Commentaires' => 'Installation complète - Client professionnel'
                 ],
                 [
                     'TechnicienID' => 2,
                     'ClientID' => 1,
-                    'TypeIntervention' => 'Réparation',
-                    'Description' => 'Réparation du site B',
-                    'DebutIntervention' => '2024-11-02 13:00:00',
-                    'FinIntervention' => '2024-11-02 14:00:00',
-                    'StatutIntervention' => 'En cours',
-                    'Commentaires' => 'Important'
+                    'TypeIntervention' => 'Support Technique',
+                    'Description' => 'Formation utilisation box + paramètres avancés',
+                    'DebutIntervention' => '2024-12-10 14:00:00',
+                    'FinIntervention' => '2024-12-10 16:00:00',
+                    'StatutIntervention' => 'En attente',
+                    'Commentaires' => 'Nouveau client - Formation complète'
+                ],
+                [
+                    'TechnicienID' => 2,
+                    'ClientID' => 3,
+                    'TypeIntervention' => 'Installation Fibre',
+                    'Description' => 'Raccordement fibre + test ligne',
+                    'DebutIntervention' => '2024-12-17 09:00:00',
+                    'FinIntervention' => '2024-12-17 11:30:00',
+                    'StatutIntervention' => 'En attente',
+                    'Commentaires' => 'Zone nouvellement éligible'
+                ],
+                [
+                    'TechnicienID' => 2,
+                    'ClientID' => 2,
+                    'TypeIntervention' => 'Maintenance Réseau',
+                    'Description' => 'Vérification installation + optimisation WiFi',
+                    'DebutIntervention' => '2024-12-20 13:00:00',
+                    'FinIntervention' => '2024-12-20 15:00:00',
+                    'StatutIntervention' => 'En attente',
+                    'Commentaires' => 'Mise à niveau équipements'
+                ],
+                [
+                    'TechnicienID' => 2,
+                    'ClientID' => 4,
+                    'TypeIntervention' => 'Configuration Réseau',
+                    'Description' => 'Installation système de contrôle parental',
+                    'DebutIntervention' => '2024-12-24 10:00:00',
+                    'FinIntervention' => '2024-12-24 11:30:00',
+                    'StatutIntervention' => 'En attente',
+                    'Commentaires' => 'Configuration sécurité famille'
+                ],
+                [
+                    'TechnicienID' => 2,
+                    'ClientID' => 5,
+                    'TypeIntervention' => 'Support Technique',
+                    'Description' => 'Diagnostic lenteur + optimisation réseau',
+                    'DebutIntervention' => '2024-12-27 14:00:00',
+                    'FinIntervention' => '2024-12-27 16:00:00',
+                    'StatutIntervention' => 'En attente',
+                    'Commentaires' => 'Problème de débit aux heures de pointe'
                 ]
             ];
         
@@ -279,20 +325,19 @@
                     $intervention['Commentaires']
                 );
                 $stmt->execute();
-                $stmt->close();
-            }
-        
-            // Données plannings hebdomadaires
-            foreach ($interventions as $intervention) {
+                $interventionId = $conn->insert_id;
+
+                // Insertion dans le planning hebdomadaire
                 $date = new DateTime($intervention['DebutIntervention']);
                 $sql = "INSERT INTO PlanningHebdomadaireTechnicien (TechnicienID, InterventionID, ClientID,
                         NumeroSemaine, JourSemaine, DebutIntervention, FinIntervention, StatutIntervention, Commentaires)
-                        VALUES (?, LAST_INSERT_ID(), ?, ?, ?, ?, ?, ?, ?)";
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
                 $numeroSemaine = $date->format('W');
                 $jourSemaine = $date->format('l');
-                $stmt->bind_param("iiissss",
+                $stmt->bind_param("iiisssss",
                     $intervention['TechnicienID'],
+                    $interventionId,
                     $intervention['ClientID'],
                     $numeroSemaine,
                     $jourSemaine,
@@ -307,11 +352,16 @@
         
             // Données disponibilités hebdomadaires
             $disponibilites = [
-                ['TechnicienID' => 2, 'NumeroSemaine' => 44, 'JourDisponible' => '2024-10-30', 'DebutDisponibilite' => '2024-10-30 08:00:00', 'FinDisponibilite' => '2024-10-30 17:00:00'],
-                ['TechnicienID' => 2, 'NumeroSemaine' => 44, 'JourDisponible' => '2024-10-31', 'DebutDisponibilite' => '2024-10-31 08:00:00', 'FinDisponibilite' => '2024-10-31 17:00:00'],
-                ['TechnicienID' => 2, 'NumeroSemaine' => 44, 'JourDisponible' => '2024-11-01', 'DebutDisponibilite' => '2024-11-01 08:00:00', 'FinDisponibilite' => '2024-11-01 17:00:00'],
-                ['TechnicienID' => 2, 'NumeroSemaine' => 44, 'JourDisponible' => '2024-11-02', 'DebutDisponibilite' => '2024-11-02 08:00:00', 'FinDisponibilite' => '2024-11-02 17:00:00'],
-                ['TechnicienID' => 2, 'NumeroSemaine' => 44, 'JourDisponible' => '2024-11-03', 'DebutDisponibilite' => '2024-11-03 08:00:00', 'FinDisponibilite' => '2024-11-03 17:00:00']
+                ['TechnicienID' => 2, 'NumeroSemaine' => 45, 'JourDisponible' => '2024-11-05', 'DebutDisponibilite' => '2024-11-05 08:00:00', 'FinDisponibilite' => '2024-11-05 18:00:00'],
+                ['TechnicienID' => 2, 'NumeroSemaine' => 46, 'JourDisponible' => '2024-11-12', 'DebutDisponibilite' => '2024-11-12 08:00:00', 'FinDisponibilite' => '2024-11-12 18:00:00'],
+                ['TechnicienID' => 2, 'NumeroSemaine' => 47, 'JourDisponible' => '2024-11-19', 'DebutDisponibilite' => '2024-11-19 08:00:00', 'FinDisponibilite' => '2024-11-19 18:00:00'],
+                ['TechnicienID' => 2, 'NumeroSemaine' => 48, 'JourDisponible' => '2024-11-26', 'DebutDisponibilite' => '2024-11-26 08:00:00', 'FinDisponibilite' => '2024-11-26 18:00:00'],
+                ['TechnicienID' => 2, 'NumeroSemaine' => 49, 'JourDisponible' => '2024-12-03', 'DebutDisponibilite' => '2024-12-03 08:00:00', 'FinDisponibilite' => '2024-12-03 18:00:00'],
+                ['TechnicienID' => 2, 'NumeroSemaine' => 50, 'JourDisponible' => '2024-12-10', 'DebutDisponibilite' => '2024-12-10 08:00:00', 'FinDisponibilite' => '2024-12-10 18:00:00'],
+                ['TechnicienID' => 2, 'NumeroSemaine' => 51, 'JourDisponible' => '2024-12-17', 'DebutDisponibilite' => '2024-12-17 08:00:00', 'FinDisponibilite' => '2024-12-17 18:00:00'],
+                ['TechnicienID' => 2, 'NumeroSemaine' => 51, 'JourDisponible' => '2024-12-20', 'DebutDisponibilite' => '2024-12-20 08:00:00', 'FinDisponibilite' => '2024-12-20 18:00:00'],
+                ['TechnicienID' => 2, 'NumeroSemaine' => 52, 'JourDisponible' => '2024-12-24', 'DebutDisponibilite' => '2024-12-24 08:00:00', 'FinDisponibilite' => '2024-12-24 18:00:00'],
+                ['TechnicienID' => 2, 'NumeroSemaine' => 52, 'JourDisponible' => '2024-12-27', 'DebutDisponibilite' => '2024-12-27 08:00:00', 'FinDisponibilite' => '2024-12-27 18:00:00']
             ];
         
             foreach ($disponibilites as $disponibilite) {

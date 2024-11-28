@@ -17,6 +17,20 @@ class InterventionModel {
         $this->conn = $conn;
     }
 
+    public function getAllInterventions() {
+        $query = "SELECT * FROM Intervention";
+        $result = $this->conn->query($query);
+        $interventions = [];
+        
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $interventions[] = $row;
+            }
+        }
+        
+        return $interventions;
+    }
+
     public function getInterventionById($id) {
         $stmt = $this->conn->prepare("SELECT * FROM Intervention WHERE InterventionID = ?");
         $stmt->bind_param('i', $id);

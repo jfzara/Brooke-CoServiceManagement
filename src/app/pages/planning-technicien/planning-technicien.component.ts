@@ -1,132 +1,102 @@
 import { Component, OnInit } from '@angular/core';
-import { InterventionService } from '../../services/intervention.service';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { InterventionService, Intervention, STATUS_TYPES } from '../../services/intervention.service';
 
 @Component({
   selector: 'app-planning-technicien',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule],
   templateUrl: './planning-technicien.component.html',
-  styleUrl: './planning-technicien.component.css',
+  styleUrls: ['./planning-technicien.component.css']
 })
 export class PlanningTechnicienComponent implements OnInit {
+  interventions: Intervention[] = [];
+  selectedIntervention: Intervention | null = null;
   showModal = false;
-  selectedIntervention: any;
-  description: string ="";
-  isPushOut = false;
-  interventions: any[] = [];
-  technicienID: number = 2;
+  loading = false;
+  error: string | null = null;
+  readonly STATUS_TYPES = STATUS_TYPES;
 
-  constructor(
-    private interventionService: InterventionService,
-    private router: Router
-  ) {}
+  constructor(private interventionService: InterventionService) {}
 
-  ngOnInit(): void {
-    this.loadPlannings(this.technicienID);
+  ngOnInit() {
+    this.loadInterventions();
   }
 
-  editIntervention(id: number) {
-    this.router.navigate(['/intervention/edit', id]);
-  }
-
-  
-
-  loadPlannings(technicienID: number) {
-    this.interventionService
-      .getPlanningByTechnicienWithMoreInfos(technicienID)
-      .subscribe((planningData: any[]) => {
-        console.log(planningData);
-        this.interventions = planningData;
+  loadInterventions() {
+    this.loading = true;
+    this.error = null;
+    const technicienId = 2; // À remplacer par l'ID du technicien connecté
+    this.interventionService.getPlanningByTechnicienWithMoreInfos(technicienId)
+      .subscribe({
+        next: (data) => {
+          this.interventions = data;
+          this.loading = false;
+        },
+        error: (error) => {
+          this.error = 'Erreur lors du chargement des interventions';
+          this.loading = false;
+          console.error('Erreur:', error);
+        }
       });
   }
 
-  openModal(intervention: any) {
-    this.selectedIntervention = intervention;
-    this.showModal = true;
-  }
-
-  openModalToFinalize(intervention: any, ) {
-    this.selectedIntervention = intervention;
-    this.showModal = true;
-    this.isPushOut = true;
-  }
-
-  closeModal() {
-    this.showModal = false;
-    this.isPushOut = false;
-  }
-
-  getStatusClass(statut: string): string {
-    switch (statut) {
-      case 'Assignee':
-        return 'status-assignee';
-      case 'Activee':
-        return 'status-activee';
-      case 'En cours':
-        return 'status-en-cours';
-      case 'Terminee':
-        return 'status-terminee';
-      case 'Annulee':
-        return 'status-annulee';
+  getStatusClass(status: string): string {
+    switch (status) {
+      case STATUS_TYPES.PENDING:
+        return 'status-pending';
+      case STATUS_TYPES.IN_PROGRESS:
+        return 'status-progress';
+      case STATUS_TYPES.COMPLETED:
+        return 'status-completed';
       default:
         return '';
     }
   }
 
-  updateStatusWithHour(intervention: any, statut: string){
-    const data = {
-      InterventionID: intervention.InterventionID,
-      Statut: statut,
-      Date: intervention.DateIntervention,
-      Heure: this.getCurrentTime()
-    }
-    this.interventionService.updateStatusIntervention(data).subscribe(result => {
-      console.log(result);
-      this.loadPlannings(this.technicienID);
-    })
+  editIntervention(intervention: Intervention) {
+    this.selectedIntervention = intervention;
+    this.showModal = true;
   }
 
-  updateStatusWithoutHour(intervention: any, statut: string){
-    const data = {
-      InterventionID: intervention.InterventionID,
-      Statut: statut,
-      Date: intervention.DateIntervention,
-    }
-    this.interventionService.updateStatusIntervention(data).subscribe(result => {
-      console.log(result);
-      this.loadPlannings(this.technicienID);
-    })
+  closeModal() {
+    this.showModal = false;
+    this.selectedIntervention = null;
   }
 
-  finalizeIntervention(){
-    const data = {
-      InterventionID: this.selectedIntervention.InterventionID,
-      Statut: "Terminee",
-      Date: this.selectedIntervention.DateIntervention,
-      Heure: this.getCurrentTime(),
-      Description: this.description
-    }
-    this.interventionService.updateStatusIntervention(data).subscribe(result => {
-      console.log(result);
-      this.loadPlannings(this.technicienID);
-      this.closeModal();
-    })
+  startIntervention(intervention: Intervention) {
+    this.updateStatus(intervention, STATUS_TYPES.IN_PROGRESS);
   }
 
-  getCurrentTime = (): string => {
-    const now = new Date();
-  
-    // Récupérer l'heure, les minutes et les secondes
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const seconds = now.getSeconds();
-  
-    // Formater l'heure en format HH:MM:SS
-    const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  
-    return formattedTime;
-  };
+  completeIntervention(intervention: Intervention) {
+    this.updateStatus(intervention, STATUS_TYPES.COMPLETED);
+  }
+
+  cancelIntervention(intervention: Intervention) {
+    if (confirm('Êtes-vous sûr de vouloir annuler cette intervention ?')) {
+      this.interventionService.deleteIntervention(intervention.InterventionID!)
+        .subscribe({
+          next: () => {
+            this.loadInterventions();
+          },
+          error: (error) => {
+            console.error('Erreur lors de l\'annulation:', error);
+          }
+        });
+    }
+  }
+
+  private updateStatus(intervention: Intervention, newStatus: string) {
+    this.interventionService.updateStatusIntervention({
+      InterventionID: intervention.InterventionID!,
+      StatutIntervention: newStatus
+    }).subscribe({
+      next: () => {
+        this.loadInterventions();
+      },
+      error: (error) => {
+        console.error('Erreur lors de la mise à jour du statut:', error);
+      }
+    });
+  }
 }

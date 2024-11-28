@@ -15,8 +15,19 @@ class UtilisateurModel {
     public $CompteBrookeID;
 
     public function __construct() {
-        global $conn; 
-        $this->conn = $conn;
+        // Créer une nouvelle connexion plutôt que d'utiliser une variable globale
+        $this->conn = new mysqli('localhost', 'root', '', 'brookeandco');
+        
+        // Vérifier la connexion
+        if ($this->conn->connect_error) {
+            // Si la base de données n'existe pas, la créer
+            $tempConn = new mysqli('localhost', 'root', '');
+            $tempConn->query("CREATE DATABASE IF NOT EXISTS brookeandco");
+            $tempConn->close();
+            
+            // Reconnecter à la base de données nouvellement créée
+            $this->conn = new mysqli('localhost', 'root', '', 'brookeandco');
+        }
     }
 
     public function getUtilisateurById($id) {
@@ -78,13 +89,17 @@ class UtilisateurModel {
 
     public function getUtilisateurByFacebookID($facebookID) {
         $stmt = $this->conn->prepare("SELECT * FROM Utilisateur WHERE CompteFacebookID = ?");
-        $stmt->bind_param('s', $facebookID); // Le type 's' est pour une chaîne
+        $stmt->bind_param('s', $facebookID);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
         
         return $result ? $result : false;
     }    
     
+    public function __destruct() {
+        if ($this->conn) {
+            $this->conn->close();
+        }
+    }
 }
-
 ?>

@@ -41,6 +41,10 @@ class InterventionController {
             return "Erreur lors de la suppression de l'intervention.";
         }
     }
+    
+    public function getAllInterventions() {
+        return $this->interventionModel->getAllInterventions();
+    }
 
     // Méthode pour mettre à jour le statut d'une intervention avec gestion des heures
     public function updateStatut($id, $statut, $date = null, $heure = null, $description = null) {

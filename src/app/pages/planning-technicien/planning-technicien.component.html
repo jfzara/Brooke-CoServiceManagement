@@ -1,108 +1,92 @@
 <div class="container">
-  <table>
-    <thead>
-      <tr>
-        <th>Technicien</th>
-        <th>Type d'Intervention</th>
-        <th>Date</th>
-        <th>Heure Début</th>
-        <th>Heure Fin</th>
-        <th>Status</th>
-        <th>Commentaires</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let intervention of interventions">
-        <td>{{ intervention.Nom }} {{ intervention.Prenom }}</td>
-        <td>{{ intervention.TypeIntervention }}</td>
-        <td>{{ intervention.DateIntervention }}</td>
-        <td>{{ intervention.HeureDebut }}</td>
-        <td>{{ intervention.HeureFin }}</td>
-        <td>
-          <span [ngClass]="getStatusClass(intervention.Statut)">{{
-            intervention.Statut
-          }}</span>
-        </td>
-        <td>{{ intervention.InterventionCommentaires }}</td>
-        <td>
-          <button class="view" (click)="openModal(intervention)">
-            Visualiser
-          </button>
-          <button class="edit" (click)="editIntervention(intervention.InterventionID)">
-            Modifier
-          </button>
-          <button
-            class="active"
-            *ngIf="intervention.Statut === 'Assignee'"
-            (click)="updateStatusWithoutHour(intervention, 'Activee')"
-          >
-            Activer
-          </button>
-          <button
-            class="pushin"
-            *ngIf="intervention.Statut === 'Activee'"
-            (click)="updateStatusWithHour(intervention, 'En cours')"
-          >
-            Push IN
-          </button>
-          <button
-            class="pushout"
-            *ngIf="intervention.Statut === 'En cours'"
-            (click)="openModalToFinalize(intervention)"
-          >
-            Push OUT
-          </button>
-          <button
-            class="cancel"
-            *ngIf="intervention.Statut != 'Terminee'"
-            (click)="updateStatusWithoutHour(intervention, 'Annulee')"
-          >
-            Annuler
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <h2>Liste des Interventions</h2>
+  
+  <div *ngIf="loading" class="loading">
+    Chargement des interventions...
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error">
+    <table class="table table-striped" *ngIf="interventions.length > 0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Technicien</th>
+          <th>Client</th>
+          <th>Type</th>
+          <th>Date</th>
+          <th>Début</th>
+          <th>Fin</th>
+          <th>Statut</th>
+          <th>Commentaires</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let intervention of interventions">
+          <td>{{ intervention.InterventionID }}</td>
+          <td>{{ intervention.TechnicienID }}</td>
+          <td>{{ intervention.ClientID }}</td>
+          <td>{{ intervention.TypeIntervention }}</td>
+          <td>{{ intervention.DebutIntervention | date }}</td>
+          <td>{{ intervention.DebutIntervention | date:'HH:mm' }}</td>
+          <td>{{ intervention.FinIntervention | date:'HH:mm' }}</td>
+          <td>
+            <span [ngClass]="getStatusClass(intervention.StatutIntervention)">
+              {{ intervention.StatutIntervention }}
+            </span>
+          </td>
+          <td>{{ intervention.Commentaires }}</td>
+          <td>
+            <button class="btn btn-primary btn-sm me-2" (click)="editIntervention(intervention)">Modifier</button>
+            <button 
+              class="btn btn-success btn-sm me-2" 
+              *ngIf="intervention.StatutIntervention === STATUS_TYPES.PENDING"
+              (click)="startIntervention(intervention)">
+              Démarrer
+            </button>
+            <button 
+              class="btn btn-info btn-sm me-2" 
+              *ngIf="intervention.StatutIntervention === STATUS_TYPES.IN_PROGRESS"
+              (click)="completeIntervention(intervention)">
+              Terminer
+            </button>
+            <button 
+              class="btn btn-danger btn-sm" 
+              *ngIf="intervention.StatutIntervention !== STATUS_TYPES.COMPLETED"
+              (click)="cancelIntervention(intervention)">
+              Annuler
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="interventions.length === 0" class="no-data">
+      Aucune intervention trouvée.
+    </div>
+  </div>
 </div>
 
-<!-- Modal -->
-<div class="modal" [ngClass]="{ show: showModal }">
+<div class="modal" [ngClass]="{ show: showModal }" *ngIf="selectedIntervention">
   <div class="modal-content">
     <span class="close" (click)="closeModal()">&times;</span>
     <h2>Détails de l'intervention</h2>
-    <p>
-      <strong>Technicien:</strong> {{ selectedIntervention?.Nom }}
-      {{ selectedIntervention?.Prenom }}
-    </p>
-    <p>
-      <strong>Type d'Intervention:</strong>
-      {{ selectedIntervention?.TypeIntervention }}
-    </p>
-    <p><strong>Date:</strong> {{ selectedIntervention?.DateIntervention }}</p>
-    <p><strong>Heure Début:</strong> {{ selectedIntervention?.HeureDebut }}</p>
-    <p><strong>Heure Fin:</strong> {{ selectedIntervention?.HeureFin }}</p>
-    <p><strong>Client ID:</strong> {{ selectedIntervention?.ClientID }}</p>
-    <p>
-      <strong>Intervention Commentaire:</strong>
-      {{ selectedIntervention?.InterventionCommentaires }}
-    </p>
-    <p>
-        <strong>Commentaire Technicien:</strong>
-        {{ selectedIntervention?.PlanningCommentaires }}
-    </p>
-    <p>
-      <strong>Statut:</strong>
-      <span [ngClass]="getStatusClass(selectedIntervention?.Statut)">{{
-        selectedIntervention?.Statut
-      }}</span>
-    </p>
-    <div class="DivPushOut" *ngIf="isPushOut">
-        <p>
-            <strong>Commentaire de fin:</strong>
-            <textarea style="margin-left:10px; width: 300px; height: 50px;" id="description" [(ngModel)]="description"></textarea>
-        </p>
-        <button  class="pushout" (click)="finalizeIntervention()">Terminer</button>
-      </div>
+    <div class="modal-body">
+      <p><strong>Type:</strong> {{ selectedIntervention.TypeIntervention }}</p>
+      <p><strong>Date:</strong> {{ selectedIntervention.DebutIntervention | date }}</p>
+      <p><strong>Début:</strong> {{ selectedIntervention.DebutIntervention | date:'HH:mm' }}</p>
+      <p><strong>Fin:</strong> {{ selectedIntervention.FinIntervention | date:'HH:mm' }}</p>
+      <p><strong>Client:</strong> {{ selectedIntervention.ClientID }}</p>
+      <p><strong>Commentaires:</strong></p>
+      <p>{{ selectedIntervention.Commentaires }}</p>
+      <p><strong>Statut:</strong></p>
+      <span [ngClass]="getStatusClass(selectedIntervention.StatutIntervention)">
+        {{ selectedIntervention.StatutIntervention }}
+      </span>
+    </div>
   </div>
 </div>
