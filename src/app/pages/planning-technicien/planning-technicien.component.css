@@ -1,0 +1,140 @@
+/* interventions.component.css */
+body {
+  font-family: Arial, sans-serif;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+table,
+th,
+td {
+  border: 1px solid #ddd;
+}
+
+th,
+td {
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+  text-align: center;
+}
+
+button {
+  padding: 5px 10px;
+  margin: 2px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button.view {
+  background-color: #007bff;
+  color: #fff;
+}
+
+button.active {
+  background-color: green;
+  color: #fff;
+}
+
+button.cancel {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+button.pushin {
+  background-color: orange;
+  color: #fff;
+}
+
+button.pushout {
+  background-color: gray;
+  color: #fff;
+}
+
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.show {
+  display: block; /* Show the modal */
+}
+
+.container {
+  padding: 30px;
+}
+
+.status-assignee {
+  background-color: blue;
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+}
+.status-activee {
+  background-color: orange;
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+}
+.status-en-cours {
+  background-color: yellow;
+  color: black;
+  padding: 5px;
+  border-radius: 4px;
+}
+.status-terminee {
+  background-color: green;
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+}
+.status-annulee {
+  background-color: red;
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.DivPushOut {
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+}

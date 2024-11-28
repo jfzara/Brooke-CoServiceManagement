@@ -1,0 +1,17 @@
+{
+    "name": "vendor/brookeandco",
+    "description": "Application de gestion d'intervention",
+    "require": {
+        "facebook/graph-sdk": "^5.1",
+        "guzzlehttp/guzzle": "^7.9"
+    },
+    "require-dev": {
+        "facebook/graph-sdk": "^5.1"
+    },
+    "authors": [
+        {
+            "name": "laeticiamouto",
+            "email": "laeticiamouto.2@gmail.com"
+        }
+    ]
+}

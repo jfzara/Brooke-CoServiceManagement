@@ -1,10 +1,34 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './login/login.component';
-import { PreposeComponent } from './prepose/prepose.component';
-import { TechnicienComponent } from './technicien/technicien.component';
 
 export const routes: Routes = [
-  { path: '', component: LoginComponent },
-  { path: 'prepose', component: PreposeComponent },
-  { path: 'technicien', component: TechnicienComponent } 
+  { 
+    path: '', 
+    redirectTo: '/login', 
+    pathMatch: 'full' 
+  },
+  {
+    path: 'login',
+    loadComponent: () => import('./login/login.component')
+      .then(m => m.LoginComponent)
+  },
+  {
+    path: 'prepose',
+    loadComponent: () => import('./prepose/prepose.component')
+      .then(m => m.PreposeComponent)
+  },
+  {
+    path: 'technicien',
+    loadComponent: () => import('./technicien/technicien.component')
+      .then(m => m.TechnicienComponent)
+  },
+  {
+    path: 'planning',
+    loadComponent: () => import('./pages/planning-technicien/planning-technicien.component')
+      .then(m => m.PlanningTechnicienComponent)
+  },
+  {
+    path: 'intervention/edit/:id',
+    loadComponent: () => import('./pages/intervention-edit/intervention-edit.component')
+      .then(m => m.InterventionEditComponent)
+  }
 ];

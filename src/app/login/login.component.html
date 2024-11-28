@@ -12,32 +12,42 @@
     </div>
     <div class="login-box">
         <h2 class="login-title">Connexion</h2>
-        <form>
+        <form (ngSubmit)="onSubmit()">
             <div class="form-field">
                 <label for="email">Email</label>
-                <input type="email" id="email" placeholder="Email" required>
+                <input type="email" id="email" [(ngModel)]="email" name="email" placeholder="Email" required>
             </div>
 
             <div class="form-field">
                 <label for="password">Mot de passe</label>
-                <input type="password" id="password" placeholder="Mot de passe" required>
+                <input type="password" id="password" [(ngModel)]="password" name="password" placeholder="Mot de passe" required>
             </div>
 
-            <button class="login-button">Se connecter</button>
+            <button type="submit" class="login-button">Se connecter</button>
 
             <div class="social-login">
                 <span class="or-text">- OU -</span>
-                <button class="social-button google-button">Se connecter avec Google</button>
-                <button class="social-button facebook-button">Se connecter avec Facebook</button>
+                <button (click)="loginGoogle()" class="social-button google-button">Se connecter avec Google</button>
+                <button (click)="loginFacebook()" class="social-button facebook-button">Se connecter avec Facebook</button>
             </div>
         </form>
     </div>
-    <div>
-        
-    <!-- Footer -->
     <footer class="footer">
         <p>&copy; 2024 Brooke & Co. Tous droits réservés.</p>
         <p>Application interne pour la gestion des interventions.</p>
         <p>Contact : support&#64;brookeandco.com</p>
     </footer>
 </div>
+<!-- Ajouter ce script à la fin du body dans index.html, juste avant la fermeture de </body> -->
+<!-- <script>
+    window.initializeFacebookSDK = function() {
+      FB.init({
+        appId: '931570492178940', // Remplacez par votre App ID
+        cookie: true,
+        xfbml: true,
+        version: 'v15.0' // Utilisez la dernière version disponible
+      });
+      console.log('Facebook SDK loaded and initialized');
+    };
+  </script>
+<script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>-->
