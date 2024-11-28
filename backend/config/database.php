@@ -1,17 +1,25 @@
 <?php
+$servername = "localhost";
+$username = "root";  
+$password = "";      
+$dbname = "brookeandco";
 
-    $host = 'localhost';
-    $dbname = 'brookeandco';
-    $username = 'root';
-    $password = '';
+// Création de la connexion sans spécifier la base de données
+$conn = new mysqli($servername, $username, $password);
 
-    $conn = new mysqli($host, $username, $password, $dbname);
+// Vérification de la connexion
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
-    if ($conn->connect_error) {
-        echo "Erreur de connexion: " . addslashes($conn->connect_error);
-        die();
-    } else {
-        //echo "Connexion réussie à la base de données!";
-    }
+// Création de la base de données si elle n'existe pas
+$sql = "CREATE DATABASE IF NOT EXISTS $dbname";
+if ($conn->query($sql) === TRUE) {
+    echo "Base de données créée avec succès ou déjà existante<br/>";
+} else {
+    echo "Erreur lors de la création de la base de données: " . $conn->error;
+    die();
+}
 
-?>
+// Sélection de la base de données
+$conn->select_db($dbname);

@@ -1,134 +1,109 @@
 <?php
-
-    require 'database.php';
-    require_once '../app/models/UtilisateurModel.php';
-    require_once '../app/models/ClientModel.php';
-    require_once '../app/models/TechnicienModel.php';
-    require_once '../app/models/PreposeModel.php';
-    require_once '../app/models/GestionnaireModel.php';
-    require_once '../app/models/InterventionModel.php';
-    require_once '../app/models/PlanningTechnicienModel.php';
-    require_once '../app/models/DisponibiliteTechnicienModel.php';
-    require_once '../app/models/NotificationClientModel.php';
-    require_once '../app/models/NotificationTechnicienModel.php';
-
+    require_once __DIR__ . '/database.php';
+    require_once __DIR__ . '/../app/models/UtilisateurModel.php';
+    require_once __DIR__ . '/../app/models/ClientModel.php';
+    require_once __DIR__ . '/../app/models/TechnicienModel.php';
+    require_once __DIR__ . '/../app/models/PreposeModel.php';
+    require_once __DIR__ . '/../app/models/GestionnaireModel.php';
+    require_once __DIR__ . '/../app/models/InterventionModel.php';
+    require_once __DIR__ . '/../app/models/PlanningTechnicienModel.php';
+    require_once __DIR__ . '/../app/models/DisponibiliteTechnicienModel.php';
+    require_once __DIR__ . '/../app/models/NotificationClientModel.php';
+    require_once __DIR__ . '/../app/models/NotificationTechnicienModel.php';
 
     $tables = [
         "CREATE TABLE IF NOT EXISTS Utilisateur (
-                UtilisateurID INT AUTO_INCREMENT PRIMARY KEY,
-                Nom VARCHAR(255) NOT NULL,
-                Prenom VARCHAR(255) NOT NULL,
-                Email VARCHAR(255) NOT NULL,
-                MotDePasse VARCHAR(255) NOT NULL,
-                Type ENUM ('admin', 'client', 'technicien', 'prepose', 'gestionnaire') NOT NULL,
-                CompteGoogleID VARCHAR(255),
-                CompteFacebookID VARCHAR(255),
-                CompteBrookeID VARCHAR(255)
-            )",
-        "CREATE TABLE IF NOT EXISTS Prepose (
-                PreposeID INT AUTO_INCREMENT PRIMARY KEY,
-                UtilisateurID INT,
-                FOREIGN KEY (UtilisateurID) REFERENCES Utilisateur(UtilisateurID)
-            )",
-        "CREATE TABLE IF NOT EXISTS Gestionnaire (
-                GestionnaireID INT AUTO_INCREMENT PRIMARY KEY,
-                UtilisateurID INT,
-                FOREIGN KEY (UtilisateurID) REFERENCES Utilisateur(UtilisateurID)
-            )",
-        "CREATE TABLE IF NOT EXISTS Client (
-                ClientID INT AUTO_INCREMENT PRIMARY KEY,
-                Adresse VARCHAR(255) NOT NULL,
-                Telephone VARCHAR(255) NOT NULL,
-                Demandes VARCHAR(255) NOT NULL,
-                UtilisateurID INT,
-                FOREIGN KEY (UtilisateurID) REFERENCES Utilisateur(UtilisateurID)
-            )",
-        "CREATE TABLE IF NOT EXISTS Technicien (
-                TechnicienID INT AUTO_INCREMENT PRIMARY KEY,
-                UtilisateurID INT,
-                FOREIGN KEY (UtilisateurID) REFERENCES Utilisateur(UtilisateurID)
-            )",
-        "CREATE TABLE IF NOT EXISTS Intervention (
-                InterventionID INT AUTO_INCREMENT PRIMARY KEY,
-                TechnicienID INT,
-                ClientID INT,
-                TypeIntervention VARCHAR(255) NOT NULL,
-                Description TEXT,
-                Date DATE,
-                Heure TIME,
-                HeureDebut TIME,
-                HeureFin TIME,
-                Statut VARCHAR(255) NOT NULL,
-                Commentaires TEXT,
-                FOREIGN KEY (TechnicienID) REFERENCES Technicien(TechnicienID),
-                FOREIGN KEY (ClientID) REFERENCES Client(ClientID)
-            )",
-        "CREATE TABLE IF NOT EXISTS PlanningTechnicien (
-                PlanningID INT AUTO_INCREMENT PRIMARY KEY,
-                TechnicienID INT,
-                InterventionID INT,
-                DateIntervention DATE,
-                HeureDebut TIME,
-                HeureFin TIME,
-                Commentaires TEXT,
-                FOREIGN KEY (TechnicienID) REFERENCES Technicien(TechnicienID),
-                FOREIGN KEY (InterventionID) REFERENCES Intervention(InterventionID)
-            )",
-        "CREATE TABLE IF NOT EXISTS DisponibiliteTechnicien (
-                DisponibiliteID INT AUTO_INCREMENT PRIMARY KEY,
-                TechnicienID INT,
-                Date DATE,
-                HeureDebut TIME,
-                HeureFin TIME,
-                FOREIGN KEY (TechnicienID) REFERENCES Technicien(TechnicienID)
-            )",
-        "CREATE TABLE IF NOT EXISTS NotificationTechnicien (
-                NotificationID INT AUTO_INCREMENT PRIMARY KEY,
-                TechnicienID INT,
-                TypeNotification VARCHAR(255) NOT NULL,
-                Message TEXT,
-                DateEnvoi DATE,
-                HeureEnvoi TIME,
-                Lu BOOLEAN,
-                FOREIGN KEY (TechnicienID) REFERENCES Technicien(TechnicienID)
-            )",
-        "CREATE TABLE IF NOT EXISTS NotificationClient (
-                NotificationID INT AUTO_INCREMENT PRIMARY KEY,
-                ClientID INT,
-                TechnicienID INT,
-                TypeNotification VARCHAR(255) NOT NULL,
-                Message TEXT,
-                DateEnvoi DATE,
-                HeureEnvoi TIME,
-                Lu BOOLEAN,
-                FOREIGN KEY (ClientID) REFERENCES Client(ClientID),
-                FOREIGN KEY (TechnicienID) REFERENCES Technicien(TechnicienID)
-            )",
-        "CREATE TABLE IF NOT EXISTS Roles (
-                RoleID INT PRIMARY KEY AUTO_INCREMENT,
-                RoleName VARCHAR(50) UNIQUE
-            )",
-        "CREATE TABLE IF NOT EXISTS Permissions (
-                PermissionID INT PRIMARY KEY AUTO_INCREMENT,
-                PermissionName VARCHAR(50) UNIQUE
-            )",
-        "CREATE TABLE IF NOT EXISTS Role_Permissions (
-                RoleID INT,
-                PermissionID INT,
-                PRIMARY KEY (RoleID, PermissionID),
-                FOREIGN KEY (RoleID) REFERENCES Roles(RoleID),
-                FOREIGN KEY (PermissionID) REFERENCES Permissions(PermissionID)
-            )",
-        "CREATE TABLE IF NOT EXISTS Utilisateur_Roles (
-                UtilisateurID INT,
-                RoleID INT,
-                PRIMARY KEY (UtilisateurID, RoleID),
-                FOREIGN KEY (UtilisateurID) REFERENCES Utilisateur(UtilisateurID),
-                FOREIGN KEY (RoleID) REFERENCES Roles(RoleID)
-            )"
-    ];
+            UtilisateurID INT AUTO_INCREMENT PRIMARY KEY,
+            Nom VARCHAR(255) NOT NULL,
+            Prenom VARCHAR(255) NOT NULL,
+            Email VARCHAR(255) NOT NULL,
+            MotDePasse VARCHAR(255) NOT NULL,
+            Type VARCHAR(50) NOT NULL,
+            CompteGoogleID VARCHAR(255),
+            CompteFacebookID VARCHAR(255),
+            CompteBrookeID VARCHAR(255)
+        )",
 
-    // ALTER TABLE brookeandco.intervention ADD COLUMN HeureDebut TIME, ADD COLUMN HeureFin TIME;
+        "CREATE TABLE IF NOT EXISTS Client (
+            ClientID INT AUTO_INCREMENT PRIMARY KEY,
+            Adresse VARCHAR(255) NOT NULL,
+            Telephone VARCHAR(255) NOT NULL,
+            Demandes TEXT,
+            UtilisateurID INT,
+            FOREIGN KEY (UtilisateurID) REFERENCES Utilisateur(UtilisateurID)
+        )",
+
+        "CREATE TABLE IF NOT EXISTS Technicien (
+            TechnicienID INT AUTO_INCREMENT PRIMARY KEY,
+            UtilisateurID INT,
+            FOREIGN KEY (UtilisateurID) REFERENCES Utilisateur(UtilisateurID)
+        )",
+
+        "CREATE TABLE IF NOT EXISTS Prepose (
+            PreposeID INT AUTO_INCREMENT PRIMARY KEY,
+            UtilisateurID INT,
+            FOREIGN KEY (UtilisateurID) REFERENCES Utilisateur(UtilisateurID)
+        )",
+
+        "CREATE TABLE IF NOT EXISTS Gestionnaire (
+            GestionnaireID INT AUTO_INCREMENT PRIMARY KEY,
+            UtilisateurID INT,
+            FOREIGN KEY (UtilisateurID) REFERENCES Utilisateur(UtilisateurID)
+        )",
+
+        "CREATE TABLE IF NOT EXISTS Intervention (
+            InterventionID INT AUTO_INCREMENT PRIMARY KEY,
+            TechnicienID INT,
+            ClientID INT,
+            TypeIntervention VARCHAR(255) NOT NULL,
+            Description TEXT,
+            DebutIntervention DATETIME,
+            FinIntervention DATETIME,
+            StatutIntervention VARCHAR(50) NOT NULL,
+            Commentaires TEXT,
+            FOREIGN KEY (TechnicienID) REFERENCES Technicien(TechnicienID),
+            FOREIGN KEY (ClientID) REFERENCES Client(ClientID)
+        )",
+
+        "CREATE TABLE IF NOT EXISTS PlanningHebdomadaireTechnicien (
+            PlanningID INT AUTO_INCREMENT PRIMARY KEY,
+            TechnicienID INT,
+            InterventionID INT,
+            ClientID INT,
+            NumeroSemaine INT NOT NULL,
+            JourSemaine ENUM('Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche') NOT NULL,
+            DebutIntervention DATETIME NOT NULL,
+            FinIntervention DATETIME NOT NULL,
+            StatutIntervention VARCHAR(50) NOT NULL,
+            Commentaires TEXT,
+            FOREIGN KEY (TechnicienID) REFERENCES Technicien(TechnicienID),
+            FOREIGN KEY (InterventionID) REFERENCES Intervention(InterventionID),
+            FOREIGN KEY (ClientID) REFERENCES Client(ClientID)
+        )",
+
+        "CREATE TABLE IF NOT EXISTS DisponibiliteHebdomadaireTechnicien (
+            DisponibiliteID INT AUTO_INCREMENT PRIMARY KEY,
+            TechnicienID INT,
+            NumeroSemaine INT NOT NULL,
+            JourDisponible DATE NOT NULL,
+            DebutDisponibilite DATETIME NOT NULL,
+            FinDisponibilite DATETIME NOT NULL,
+            FOREIGN KEY (TechnicienID) REFERENCES Technicien(TechnicienID)
+        )",
+
+        "CREATE TABLE IF NOT EXISTS NotificationClient (
+            NotificationID INT AUTO_INCREMENT PRIMARY KEY,
+            ClientID INT,
+            TechnicienID INT,
+            TypeNotification VARCHAR(50) NOT NULL,
+            Message TEXT,
+            DateEnvoi DATE NOT NULL,
+            HeureEnvoi TIME NOT NULL,
+            Lu BOOLEAN DEFAULT FALSE,
+            FOREIGN KEY (ClientID) REFERENCES Client(ClientID),
+            FOREIGN KEY (TechnicienID) REFERENCES Technicien(TechnicienID)
+        )"
+    ];
 
     // Exécution des requêtes de création de tables
     $isCreate = true;
@@ -142,8 +117,7 @@
         }
     }
 
-    function dataExists($conn, $table)
-    {
+    function dataExists($conn, $table) {
         $query = "SELECT COUNT(*) FROM $table";
         $result = $conn->query($query);
         if ($result) {
@@ -154,8 +128,12 @@
     }
 
     if ($isCreate) {
+        $tablesToCheck = [
+            'utilisateur', 'client', 'technicien', 'prepose', 'gestionnaire',
+            'intervention', 'planninghebdomadairetechnicien', 'disponibilitehebdomadairetechnicien',
+            'notificationclient'
+        ];
 
-        $tablesToCheck = ['utilisateur', 'client', 'technicien', 'prepose', 'gestionnaire', 'intervention', 'planningtechnicien', 'disponibilitetechnicien', 'notificationclient', 'notificationtechnicien'];
         $dataExists = false;
         foreach ($tablesToCheck as $table) {
             if (dataExists($conn, $table)) {
@@ -165,18 +143,6 @@
         }
 
         if (!$dataExists) {
-            // Initialiser les modèles avec la connexion à la base de données
-            $utilisateurModel = new UtilisateurModel();
-            $clientModel = new ClientModel($conn);
-            $technicienModel = new TechnicienModel($conn);
-            $preposeModel = new PreposeModel($conn);
-            $gestionnaireModel = new GestionnaireModel($conn);
-            $interventionModel = new InterventionModel();
-            $planningModel = new PlanningTechnicienModel();
-            $disponibiliteModel = new DisponibiliteTechnicienModel();
-            $notificationClientModel = new NotificationClientModel();
-            $notificationTechnicienModel = new NotificationTechnicienModel();
-
             // Données utilisateurs fictives
             $utilisateurs = [
                 ['Nom' => 'Dupont', 'Prenom' => 'Jean', 'Email' => 'jean.dupont@example.com', 'MotDePasse' => 'password123', 'Type' => 'client', 'CompteGoogleID' => '', 'CompteFacebookID' => '', 'CompteBrookeID' => ''],
@@ -185,11 +151,25 @@
                 ['Nom' => 'Durand', 'Prenom' => 'Marie', 'Email' => 'marie.durand@example.com', 'MotDePasse' => 'password123', 'Type' => 'gestionnaire', 'CompteGoogleID' => '', 'CompteFacebookID' => '', 'CompteBrookeID' => ''],
                 ['Nom' => 'Moreau', 'Prenom' => 'Pierre', 'Email' => 'pierre.moreau@example.com', 'MotDePasse' => 'password123', 'Type' => 'client', 'CompteGoogleID' => '', 'CompteFacebookID' => '', 'CompteBrookeID' => '']
             ];
-
+        
             foreach ($utilisateurs as $utilisateur) {
-                $utilisateurModel->creerUtilisateur($utilisateur);
+                $sql = "INSERT INTO Utilisateur (Nom, Prenom, Email, MotDePasse, Type, CompteGoogleID, CompteFacebookID, CompteBrookeID) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("ssssssss", 
+                    $utilisateur['Nom'],
+                    $utilisateur['Prenom'],
+                    $utilisateur['Email'],
+                    $utilisateur['MotDePasse'],
+                    $utilisateur['Type'],
+                    $utilisateur['CompteGoogleID'],
+                    $utilisateur['CompteFacebookID'],
+                    $utilisateur['CompteBrookeID']
+                );
+                $stmt->execute();
+                $stmt->close();
             }
-
+        
             // Données clients fictives
             $clients = [
                 ['Adresse' => '123 Rue Principale', 'Telephone' => '0123456789', 'Demandes' => 'Nettoyage', 'UtilisateurID' => 1],
@@ -198,11 +178,20 @@
                 ['Adresse' => '321 Place de la Concorde', 'Telephone' => '0178346952', 'Demandes' => 'Installation', 'UtilisateurID' => 5],
                 ['Adresse' => '654 Rue de Rivoli', 'Telephone' => '0192837465', 'Demandes' => 'Inspection', 'UtilisateurID' => 1]
             ];
-
+        
             foreach ($clients as $client) {
-                $clientModel->creerClient($client);
+                $sql = "INSERT INTO Client (Adresse, Telephone, Demandes, UtilisateurID) VALUES (?, ?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("sssi", 
+                    $client['Adresse'],
+                    $client['Telephone'],
+                    $client['Demandes'],
+                    $client['UtilisateurID']
+                );
+                $stmt->execute();
+                $stmt->close();
             }
-
+        
             // Données techniciens fictives
             $techniciens = [
                 ['UtilisateurID' => 2],
@@ -211,101 +200,138 @@
                 ['UtilisateurID' => 2],
                 ['UtilisateurID' => 2]
             ];
-
+        
             foreach ($techniciens as $technicien) {
-                $technicienModel->creerTechnicien($technicien);
+                $sql = "INSERT INTO Technicien (UtilisateurID) VALUES (?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("i", $technicien['UtilisateurID']);
+                $stmt->execute();
+                $stmt->close();
             }
-
-            // Données préposés fictives
-            $preposes = [
-                ['UtilisateurID' => 1],
-                ['UtilisateurID' => 1],
-                ['UtilisateurID' => 1],
-                ['UtilisateurID' => 1],
-                ['UtilisateurID' => 1]
-            ];
-
-            foreach ($preposes as $prepose) {
-                $preposeModel->creerPrepose($prepose);
-            }
-
-            // Données gestionnaires fictives
-            $gestionnaires = [
-                ['UtilisateurID' => 4],
-                ['UtilisateurID' => 4],
-                ['UtilisateurID' => 4],
-                ['UtilisateurID' => 4],
-                ['UtilisateurID' => 4]
-            ];
-
-            foreach ($gestionnaires as $gestionnaire) {
-                $gestionnaireModel->creerGestionnaire($gestionnaire);
-            }
-
+        
             // Données interventions fictives
             $interventions = [
-                ['TechnicienID' => 2, 'ClientID' => 1, 'TypeIntervention' => 'Réparation', 'Description' => 'Réparation de la machine X', 'Date' => '2024-10-29', 'Heure' => '10:00', 'Statut' => 'En attente', 'Commentaires' => 'Urgent'],
-                ['TechnicienID' => 2, 'ClientID' => 1, 'TypeIntervention' => 'Maintenance', 'Description' => 'Maintenance du système Y', 'Date' => '2024-10-30', 'Heure' => '14:00', 'Statut' => 'En cours', 'Commentaires' => 'Routine'],
-                ['TechnicienID' => 2, 'ClientID' => 1, 'TypeIntervention' => 'Installation', 'Description' => 'Installation du dispositif Z', 'Date' => '2024-10-31', 'Heure' => '09:00', 'Statut' => 'Terminé', 'Commentaires' => 'Nécessite vérification'],
-                ['TechnicienID' => 2, 'ClientID' => 5, 'TypeIntervention' => 'Inspection', 'Description' => 'Inspection de la machine A', 'Date' => '2024-11-01', 'Heure' => '11:00', 'Statut' => 'En attente', 'Commentaires' => 'Préventif'],
-                ['TechnicienID' => 2, 'ClientID' => 1, 'TypeIntervention' => 'reparation', 'Description' => 'reparation du site B', 'Date' => '2024-11-02', 'Heure' => '13:00', 'Statut' => 'En cours', 'Commentaires' => 'Important']
+                [
+                    'TechnicienID' => 2,
+                    'ClientID' => 1,
+                    'TypeIntervention' => 'Réparation',
+                    'Description' => 'Réparation de la machine X',
+                    'DebutIntervention' => '2024-10-29 10:00:00',
+                    'FinIntervention' => '2024-10-29 11:00:00',
+                    'StatutIntervention' => 'En attente',
+                    'Commentaires' => 'Urgent'
+                ],
+                [
+                    'TechnicienID' => 2,
+                    'ClientID' => 1,
+                    'TypeIntervention' => 'Maintenance',
+                    'Description' => 'Maintenance du système Y',
+                    'DebutIntervention' => '2024-10-30 14:00:00',
+                    'FinIntervention' => '2024-10-30 15:00:00',
+                    'StatutIntervention' => 'En cours',
+                    'Commentaires' => 'Routine'
+                ],
+                [
+                    'TechnicienID' => 2,
+                    'ClientID' => 1,
+                    'TypeIntervention' => 'Installation',
+                    'Description' => 'Installation du dispositif Z',
+                    'DebutIntervention' => '2024-10-31 09:00:00',
+                    'FinIntervention' => '2024-10-31 10:00:00',
+                    'StatutIntervention' => 'Terminé',
+                    'Commentaires' => 'Nécessite vérification'
+                ],
+                [
+                    'TechnicienID' => 2,
+                    'ClientID' => 5,
+                    'TypeIntervention' => 'Inspection',
+                    'Description' => 'Inspection de la machine A',
+                    'DebutIntervention' => '2024-11-01 11:00:00',
+                    'FinIntervention' => '2024-11-01 12:00:00',
+                    'StatutIntervention' => 'En attente',
+                    'Commentaires' => 'Préventif'
+                ],
+                [
+                    'TechnicienID' => 2,
+                    'ClientID' => 1,
+                    'TypeIntervention' => 'Réparation',
+                    'Description' => 'Réparation du site B',
+                    'DebutIntervention' => '2024-11-02 13:00:00',
+                    'FinIntervention' => '2024-11-02 14:00:00',
+                    'StatutIntervention' => 'En cours',
+                    'Commentaires' => 'Important'
+                ]
             ];
-
+        
             foreach ($interventions as $intervention) {
-                $interventionModel->creerIntervention($intervention);
+                $sql = "INSERT INTO Intervention (TechnicienID, ClientID, TypeIntervention, Description, 
+                        DebutIntervention, FinIntervention, StatutIntervention, Commentaires) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("iissssss",
+                    $intervention['TechnicienID'],
+                    $intervention['ClientID'],
+                    $intervention['TypeIntervention'],
+                    $intervention['Description'],
+                    $intervention['DebutIntervention'],
+                    $intervention['FinIntervention'],
+                    $intervention['StatutIntervention'],
+                    $intervention['Commentaires']
+                );
+                $stmt->execute();
+                $stmt->close();
             }
-
-            // Données plannings fictives
-            $plannings = [
-                ['TechnicienID' => 2, 'InterventionID' => 1, 'DateIntervention' => '2024-10-29', 'HeureDebut' => '10:00', 'HeureFin' => '11:00', 'Commentaires' => 'Assurez-vous d\'avoir les pièces nécessaires'],
-                ['TechnicienID' => 2, 'InterventionID' => 2, 'DateIntervention' => '2024-10-30', 'HeureDebut' => '14:00', 'HeureFin' => '15:00', 'Commentaires' => 'Routine'],
-                ['TechnicienID' => 2, 'InterventionID' => 3, 'DateIntervention' => '2024-10-31', 'HeureDebut' => '09:00', 'HeureFin' => '10:00', 'Commentaires' => 'Nécessite vérification'],
-                ['TechnicienID' => 2, 'InterventionID' => 4, 'DateIntervention' => '2024-11-01', 'HeureDebut' => '11:00', 'HeureFin' => '12:00', 'Commentaires' => 'Préventif'],
-                ['TechnicienID' => 2, 'InterventionID' => 5, 'DateIntervention' => '2024-11-02', 'HeureDebut' => '13:00', 'HeureFin' => '14:00', 'Commentaires' => 'Important']
-            ];
-
-            foreach ($plannings as $planning) {
-                $planningModel->creerPlanningTechnicien($planning);
+        
+            // Données plannings hebdomadaires
+            foreach ($interventions as $intervention) {
+                $date = new DateTime($intervention['DebutIntervention']);
+                $sql = "INSERT INTO PlanningHebdomadaireTechnicien (TechnicienID, InterventionID, ClientID,
+                        NumeroSemaine, JourSemaine, DebutIntervention, FinIntervention, StatutIntervention, Commentaires)
+                        VALUES (?, LAST_INSERT_ID(), ?, ?, ?, ?, ?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                $numeroSemaine = $date->format('W');
+                $jourSemaine = $date->format('l');
+                $stmt->bind_param("iiissss",
+                    $intervention['TechnicienID'],
+                    $intervention['ClientID'],
+                    $numeroSemaine,
+                    $jourSemaine,
+                    $intervention['DebutIntervention'],
+                    $intervention['FinIntervention'],
+                    $intervention['StatutIntervention'],
+                    $intervention['Commentaires']
+                );
+                $stmt->execute();
+                $stmt->close();
             }
-
-            // Données disponibilités fictives
+        
+            // Données disponibilités hebdomadaires
             $disponibilites = [
-                ['TechnicienID' => 2, 'Date' => '2024-10-30', 'HeureDebut' => '08:00', 'HeureFin' => '17:00'],
-                ['TechnicienID' => 2, 'Date' => '2024-10-31', 'HeureDebut' => '08:00', 'HeureFin' => '17:00'],
-                ['TechnicienID' => 2, 'Date' => '2024-11-01', 'HeureDebut' => '08:00', 'HeureFin' => '17:00'],
-                ['TechnicienID' => 2, 'Date' => '2024-11-02', 'HeureDebut' => '08:00', 'HeureFin' => '17:00'],
-                ['TechnicienID' => 2, 'Date' => '2024-11-03', 'HeureDebut' => '08:00', 'HeureFin' => '17:00']
+                ['TechnicienID' => 2, 'NumeroSemaine' => 44, 'JourDisponible' => '2024-10-30', 'DebutDisponibilite' => '2024-10-30 08:00:00', 'FinDisponibilite' => '2024-10-30 17:00:00'],
+                ['TechnicienID' => 2, 'NumeroSemaine' => 44, 'JourDisponible' => '2024-10-31', 'DebutDisponibilite' => '2024-10-31 08:00:00', 'FinDisponibilite' => '2024-10-31 17:00:00'],
+                ['TechnicienID' => 2, 'NumeroSemaine' => 44, 'JourDisponible' => '2024-11-01', 'DebutDisponibilite' => '2024-11-01 08:00:00', 'FinDisponibilite' => '2024-11-01 17:00:00'],
+                ['TechnicienID' => 2, 'NumeroSemaine' => 44, 'JourDisponible' => '2024-11-02', 'DebutDisponibilite' => '2024-11-02 08:00:00', 'FinDisponibilite' => '2024-11-02 17:00:00'],
+                ['TechnicienID' => 2, 'NumeroSemaine' => 44, 'JourDisponible' => '2024-11-03', 'DebutDisponibilite' => '2024-11-03 08:00:00', 'FinDisponibilite' => '2024-11-03 17:00:00']
             ];
-
+        
             foreach ($disponibilites as $disponibilite) {
-                $disponibiliteModel->creerDisponibiliteTechnicien($disponibilite);
+                $sql = "INSERT INTO DisponibiliteHebdomadaireTechnicien (TechnicienID, NumeroSemaine, JourDisponible,
+                        DebutDisponibilite, FinDisponibilite) VALUES (?, ?, ?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("iisss",
+                    $disponibilite['TechnicienID'],
+                    $disponibilite['NumeroSemaine'],
+                    $disponibilite['JourDisponible'],
+                    $disponibilite['DebutDisponibilite'],
+                    $disponibilite['FinDisponibilite']
+                );
+                $stmt->execute();
+                $stmt->close();
             }
-
-            // Données notificationsClient fictives
-            $notificationClients = [
-                ['TechnicienID' => 2, 'ClientID' => 1, 'TypeNotification' => 'sms', 'Message' => 'Votre intervention est prévue pour demain.', 'DateEnvoi' => '2024-10-29', 'HeureEnvoi' => '09:00', 'Lu' => 0],
-                ['TechnicienID' => 2, 'ClientID' => 1, 'TypeNotification' => 'sms', 'Message' => 'Ne manquez pas votre intervention!', 'DateEnvoi' => '2024-10-30', 'HeureEnvoi' => '10:00', 'Lu' => 0],
-                ['TechnicienID' => 2, 'ClientID' => 5, 'TypeNotification' => 'sms', 'Message' => 'Votre intervention a été confirmée.', 'DateEnvoi' => '2024-10-31', 'HeureEnvoi' => '11:00', 'Lu' => 0],
-                ['TechnicienID' => 2, 'ClientID' => 1, 'TypeNotification' => 'sms', 'Message' => 'Votre intervention est en cours.', 'DateEnvoi' => '2024-11-01', 'HeureEnvoi' => '12:00', 'Lu' => 0],
-                ['TechnicienID' => 2, 'ClientID' => 1, 'TypeNotification' => 'sms', 'Message' => 'Votre intervention est terminée.', 'DateEnvoi' => '2024-11-02', 'HeureEnvoi' => '13:00', 'Lu' => 0]
-            ];
-
-            foreach ($notificationClients as $notification) {
-                $notificationClientModel->creerNotificationClient($notification);
-            }
-
-            // Données notificationsTechnicien fictives
-            $notificationTechniciens = [
-                ['TechnicienID' => 2, 'TypeNotification' => 'sms', 'Message' => 'Votre intervention est prévue pour demain.', 'DateEnvoi' => '2024-10-29', 'HeureEnvoi' => '09:00', 'Lu' => 0],
-                ['TechnicienID' => 2, 'TypeNotification' => 'sms', 'Message' => 'Ne manquez pas votre intervention!', 'DateEnvoi' => '2024-10-30', 'HeureEnvoi' => '10:00', 'Lu' => 0],
-           ];
-
-            foreach ($notificationTechniciens as $notification) {
-                $notificationTechnicienModel->creerNotificationTechnicien($notification);
-            }
+        
+            echo "<br/>Données initiales insérées avec succès.";
         }
-        echo "<br/> Base de données initialisée avec des données fictives.";
-    }
-    $conn->close();
+    }  
 
+    $conn->close();
 ?>
