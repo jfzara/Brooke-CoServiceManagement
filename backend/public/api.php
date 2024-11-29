@@ -4,7 +4,7 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-ini_set('display_errors', 0);
+ini_set('display_errors', 1);
 ini_set('log_errors', 1);
 error_reporting(E_ALL);
 ini_set('error_log', __DIR__ . '/php_errors.log');
@@ -50,8 +50,13 @@ function handleGetRequest($action) {
                     return;
                 }
                 
+                error_log("Récupération des interventions pour le technicien: " . $_GET['technicienId']);
+                
                 $technicienController = new TechnicienController();
                 $response = $technicienController->getTechnicienInterventions($_GET['technicienId']);
+                
+                error_log("Réponse du contrôleur: " . json_encode($response));
+                
                 sendJsonResponse($response);
                 break;
 

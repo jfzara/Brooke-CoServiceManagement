@@ -22,13 +22,13 @@ class UtilisateurModel {
         try {
             error_log("Tentative de vérification pour l'email: " . $email);
             
-            $stmt = $this->conn->prepare("SELECT * FROM Utilisateur WHERE Email = ? AND MotDePasse = ?");
+            $stmt = $this->conn->prepare("SELECT * FROM Utilisateur WHERE Email = ?");
             if (!$stmt) {
                 error_log("Erreur de préparation SQL: " . $this->conn->error);
                 throw new Exception("Erreur de préparation de la requête");
             }
 
-            $stmt->bind_param("ss", $email, $motDePasse);
+            $stmt->bind_param("s", $email);
             
             if (!$stmt->execute()) {
                 error_log("Erreur d'exécution SQL: " . $stmt->error);
@@ -38,11 +38,21 @@ class UtilisateurModel {
             $result = $stmt->get_result();
             $utilisateur = $result->fetch_assoc();
             
-            error_log("Résultat de la vérification: " . ($utilisateur ? "Utilisateur trouvé" : "Utilisateur non trouvé"));
+            if ($utilisateur) {
+                error_log("Utilisateur trouvé, vérification du mot de passe");
+                if (password_verify($motDePasse, $utilisateur['MotDePasse'])) {
+                    error_log("Mot de passe vérifié avec succès");
+                    return $utilisateur;
+                } else {
+                    error_log("Mot de passe incorrect");
+                    return null;
+                }
+            } else {
+                error_log("Aucun utilisateur trouvé avec cet email");
+                return null;
+            }
             
             $stmt->close();
-            return $utilisateur;
-            
         } catch (Exception $e) {
             error_log("Exception dans verifierUtilisateur: " . $e->getMessage());
             throw $e;
@@ -61,18 +71,21 @@ class UtilisateurModel {
     }
 
     public function creerUtilisateur($data) {
+        $motDePasseHash = password_hash($data['motDePasse'], PASSWORD_DEFAULT);
+        
         $stmt = $this->conn->prepare("INSERT INTO Utilisateur (Nom, Prenom, Email, MotDePasse, Type) VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param("sssss", 
-            $data['Nom'],
-            $data['Prenom'],
-            $data['Email'],
-            $data['MotDePasse'],
-            $data['Type']
+            $data['nom'],
+            $data['prenom'],
+            $data['email'],
+            $motDePasseHash,
+            $data['type']
         );
-        $success = $stmt->execute();
+        
+        $result = $stmt->execute();
         $stmt->close();
         
-        return $success;
+        return $result;
     }
 
     public function modifierUtilisateur($id, $data) {
