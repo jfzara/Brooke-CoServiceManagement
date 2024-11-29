@@ -31,7 +31,7 @@ export class TechnicienComponent implements OnInit {
   filterValue: string = '';
   loading = false;
   error = '';
-  userProfile: UserProfile | null = null;
+  userProfile: UserProfile;
 
   readonly STATUS_TYPES = STATUS_TYPES;
 
@@ -54,10 +54,11 @@ export class TechnicienComponent implements OnInit {
     private interventionService: InterventionService,
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) {
+    this.userProfile = this.authService.userProfile;
+  }
 
   ngOnInit() {
-    this.userProfile = this.authService.userProfile;
     this.loadInterventions();
   }
 
@@ -69,7 +70,6 @@ export class TechnicienComponent implements OnInit {
   private loadInterventions() {
     if (!this.userProfile?.technicienId) {
       this.error = 'Utilisateur non connecté ou non technicien';
-      console.error('No technicienId found:', this.userProfile);
       return;
     }
 
@@ -99,27 +99,24 @@ export class TechnicienComponent implements OnInit {
 
   updateFilteredInterventions() {
     this.filteredInterventions = this.interventions.filter(intervention => {
-      const matchesSearch = this.searchTerm === '' || 
-        Object.values(intervention).some(value => 
-          value?.toString().toLowerCase().includes(this.searchTerm.toLowerCase())
+      const searchFields = [
+        intervention.TypeIntervention,
+        intervention.Description,
+        intervention.ClientID?.toString(),
+        new Date(intervention.DebutIntervention).toLocaleDateString(),
+        intervention.StatutIntervention
+      ];
+
+      const matchesSearch = !this.searchTerm || 
+        searchFields.some(field => 
+          field?.toLowerCase().includes(this.searchTerm.toLowerCase())
         );
 
-      const matchesFilter = this.filterValue === '' ||
+      const matchesFilter = !this.filterValue || 
         intervention.StatutIntervention.toLowerCase() === this.filterValue.toLowerCase();
 
       return matchesSearch && matchesFilter;
     });
-  }
-
-  updateCalendarEvents() {
-    this.calendarOptions.events = this.interventions
-      .filter(intervention => new Date(intervention.DebutIntervention) >= new Date())
-      .map(intervention => ({
-        title: `${intervention.TypeIntervention} - ${intervention.client?.Nom || 'Client ' + intervention.ClientID}`,
-        start: intervention.DebutIntervention,
-        end: intervention.FinIntervention,
-        backgroundColor: getStatusColor(intervention.StatutIntervention)
-      }));
   }
 
   onSearch(event: any) {
@@ -133,13 +130,17 @@ export class TechnicienComponent implements OnInit {
   }
 
   startIntervention(intervention: Intervention) {
-    intervention.StatutIntervention = STATUS_TYPES.IN_PROGRESS;
-    this.updateFilteredInterventions();
+    if (confirm('Voulez-vous démarrer cette intervention ?')) {
+      intervention.StatutIntervention = STATUS_TYPES.IN_PROGRESS;
+      this.updateFilteredInterventions();
+    }
   }
 
   completeIntervention(intervention: Intervention) {
-    intervention.StatutIntervention = STATUS_TYPES.COMPLETED;
-    this.updateFilteredInterventions();
+    if (confirm('Voulez-vous marquer cette intervention comme terminée ?')) {
+      intervention.StatutIntervention = STATUS_TYPES.COMPLETED;
+      this.updateFilteredInterventions();
+    }
   }
 
   cancelIntervention(intervention: Intervention) {
@@ -147,5 +148,16 @@ export class TechnicienComponent implements OnInit {
       intervention.StatutIntervention = STATUS_TYPES.CANCELLED;
       this.updateFilteredInterventions();
     }
+  }
+
+  updateCalendarEvents() {
+    this.calendarOptions.events = this.interventions
+      .filter(intervention => new Date(intervention.DebutIntervention) >= new Date())
+      .map(intervention => ({
+        title: `${intervention.TypeIntervention} - ${intervention.client?.Nom || 'Client ' + intervention.ClientID}`,
+        start: intervention.DebutIntervention,
+        end: intervention.FinIntervention,
+        backgroundColor: getStatusColor(intervention.StatutIntervention)
+      }));
   }
 }

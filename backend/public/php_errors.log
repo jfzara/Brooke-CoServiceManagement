@@ -304,3 +304,18 @@ Stack trace:
 [29-Nov-2024 06:59:16 UTC] Résultat de la vérification: Utilisateur trouvé
 [29-Nov-2024 06:59:16 UTC] Réponse du contrôleur: {"status":"success","message":"Connexion r\u00e9ussie","result":{"utilisateur":{"UtilisateurID":2,"Email":"sophie.martin@example.com","Nom":"Martin","Prenom":"Sophie","Type":"technicien"}}}
 [29-Nov-2024 06:59:16 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 07:21:12 UTC] Nouvelle requête - Méthode: POST, Action: login
+[29-Nov-2024 07:21:12 UTC] Données de login reçues: {"email":"sophie.martin@example.com","motDePasse":"password123"}
+[29-Nov-2024 07:21:12 UTC] Connexion à la base de données réussie
+[29-Nov-2024 07:21:12 UTC] Tentative de vérification pour l'email: sophie.martin@example.com
+[29-Nov-2024 07:21:12 UTC] Résultat de la vérification: Utilisateur trouvé
+[29-Nov-2024 07:21:12 UTC] Réponse du contrôleur: {"status":"success","message":"Connexion r\u00e9ussie","result":{"utilisateur":{"UtilisateurID":2,"Email":"sophie.martin@example.com","Nom":"Martin","Prenom":"Sophie","Type":"technicien"}}}
+[29-Nov-2024 07:21:12 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 07:21:18 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 07:21:24 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 07:21:36 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 07:22:16 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 07:22:19 UTC] Nouvelle requête - Méthode: DELETE, Action: delete_intervention
+[29-Nov-2024 07:22:21 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 07:22:30 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 07:22:41 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
