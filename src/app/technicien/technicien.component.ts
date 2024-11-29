@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { InterventionService } from '../services/intervention.service';
 import { AuthService } from '../services/auth.service';
 import { FullCalendarModule } from '@fullcalendar/angular';
@@ -10,6 +10,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import frLocale from '@fullcalendar/core/locales/fr';
 import { Intervention, STATUS_TYPES, getStatusColor } from '../models/intervention.model';
+import { UserProfile } from '../models/user.model';
 
 @Component({
   selector: 'app-technicien',
@@ -30,6 +31,7 @@ export class TechnicienComponent implements OnInit {
   filterValue: string = '';
   loading = false;
   error = '';
+  userProfile: UserProfile | null = null;
 
   readonly STATUS_TYPES = STATUS_TYPES;
 
@@ -50,51 +52,47 @@ export class TechnicienComponent implements OnInit {
 
   constructor(
     private interventionService: InterventionService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit() {
-    console.log('TechnicienComponent initialized');
+    this.userProfile = this.authService.userProfile;
     this.loadInterventions();
   }
 
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
   private loadInterventions() {
-    const currentUser = this.authService.currentUserValue;
-    console.log('Current user:', currentUser);
-    
-    if (!currentUser?.technicienId) {
+    if (!this.userProfile?.technicienId) {
       this.error = 'Utilisateur non connecté ou non technicien';
-      console.error('No technicienId found:', currentUser);
+      console.error('No technicienId found:', this.userProfile);
       return;
     }
 
     this.loading = true;
     this.error = '';
 
-    console.log('Fetching interventions for technicienId:', currentUser.technicienId);
-
-    this.interventionService.getTechnicienInterventions(currentUser.technicienId)
+    this.interventionService.getTechnicienInterventions(this.userProfile.technicienId)
       .subscribe({
         next: (response) => {
-          console.log('API Response:', response);
           if (response.status === 'success' && response.data) {
             this.interventions = response.data;
-            console.log('Interventions loaded:', this.interventions);
             this.updateFilteredInterventions();
             this.updateCalendarEvents();
           } else {
             this.error = response.message || 'Erreur lors du chargement des interventions';
-            console.error('API Error:', response);
           }
         },
         error: (error) => {
           this.error = 'Erreur lors du chargement des interventions: ' + error;
-          console.error('HTTP Error:', error);
           this.loading = false;
         },
         complete: () => {
           this.loading = false;
-          console.log('Request completed');
         }
       });
   }
@@ -111,7 +109,6 @@ export class TechnicienComponent implements OnInit {
 
       return matchesSearch && matchesFilter;
     });
-    console.log('Filtered interventions:', this.filteredInterventions);
   }
 
   updateCalendarEvents() {
@@ -123,7 +120,6 @@ export class TechnicienComponent implements OnInit {
         end: intervention.FinIntervention,
         backgroundColor: getStatusColor(intervention.StatutIntervention)
       }));
-    console.log('Calendar events updated:', this.calendarOptions.events);
   }
 
   onSearch(event: any) {

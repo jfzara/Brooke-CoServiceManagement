@@ -1,5 +1,9 @@
 <div class="header">
-  <h1 class="header-title">Dashboard Technicien</h1>
+  <h1 class="header-title">Bonjour {{userProfile?.fullName || 'Technicien'}}</h1>
+  <button class="logout-btn" (click)="logout()">
+    <i class="fas fa-sign-out-alt"></i>
+    Déconnexion
+  </button>
 </div>
 
 <div class="app-container">

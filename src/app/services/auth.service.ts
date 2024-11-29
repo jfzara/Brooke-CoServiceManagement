@@ -45,6 +45,16 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
+  public get userProfile() {
+    const user = this.currentUserValue;
+    return {
+      fullName: user ? `${user.Prenom} ${user.Nom}` : 'Technicien',
+      email: user?.Email || '',
+      type: user?.Type || '',
+      technicienId: user?.technicienId || user?.UtilisateurID
+    };
+  }
+
   login(email: string, password: string): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiUrl}?action=login`, { 
       email, 
@@ -84,6 +94,7 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('token');
     this.currentUserSubject.next(null);
   }
 

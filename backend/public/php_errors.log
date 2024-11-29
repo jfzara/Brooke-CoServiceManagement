@@ -267,3 +267,40 @@ Stack trace:
 [29-Nov-2024 06:20:31 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
 [29-Nov-2024 06:20:54 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
 [29-Nov-2024 06:21:11 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 06:37:17 UTC] Nouvelle requête - Méthode: POST, Action: login
+[29-Nov-2024 06:37:17 UTC] Données de login reçues: {"email":"sophie.martin@example.com","motDePasse":"password"}
+[29-Nov-2024 06:37:17 UTC] Connexion à la base de données réussie
+[29-Nov-2024 06:37:17 UTC] Tentative de vérification pour l'email: sophie.martin@example.com
+[29-Nov-2024 06:37:17 UTC] Résultat de la vérification: Utilisateur non trouvé
+[29-Nov-2024 06:37:17 UTC] Réponse du contrôleur: {"status":"error","message":"Email ou mot de passe incorrect"}
+[29-Nov-2024 06:37:18 UTC] Nouvelle requête - Méthode: POST, Action: login
+[29-Nov-2024 06:37:18 UTC] Données de login reçues: {"email":"sophie.martin@example.com","motDePasse":"password"}
+[29-Nov-2024 06:37:18 UTC] Connexion à la base de données réussie
+[29-Nov-2024 06:37:18 UTC] Tentative de vérification pour l'email: sophie.martin@example.com
+[29-Nov-2024 06:37:18 UTC] Résultat de la vérification: Utilisateur non trouvé
+[29-Nov-2024 06:37:18 UTC] Réponse du contrôleur: {"status":"error","message":"Email ou mot de passe incorrect"}
+[29-Nov-2024 06:37:22 UTC] Nouvelle requête - Méthode: POST, Action: login
+[29-Nov-2024 06:37:22 UTC] Données de login reçues: {"email":"sophie.martin@example.com","motDePasse":"password123"}
+[29-Nov-2024 06:37:22 UTC] Connexion à la base de données réussie
+[29-Nov-2024 06:37:22 UTC] Tentative de vérification pour l'email: sophie.martin@example.com
+[29-Nov-2024 06:37:22 UTC] Résultat de la vérification: Utilisateur trouvé
+[29-Nov-2024 06:37:22 UTC] Réponse du contrôleur: {"status":"success","message":"Connexion r\u00e9ussie","result":{"utilisateur":{"UtilisateurID":2,"Email":"sophie.martin@example.com","Nom":"Martin","Prenom":"Sophie","Type":"technicien"}}}
+[29-Nov-2024 06:37:23 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 06:37:29 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 06:37:31 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 06:37:33 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 06:40:27 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 06:40:28 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 06:40:30 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 06:40:31 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 06:40:34 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 06:40:36 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 06:46:09 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 06:57:39 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions
+[29-Nov-2024 06:59:16 UTC] Nouvelle requête - Méthode: POST, Action: login
+[29-Nov-2024 06:59:16 UTC] Données de login reçues: {"email":"sophie.martin@example.com","motDePasse":"password123"}
+[29-Nov-2024 06:59:16 UTC] Connexion à la base de données réussie
+[29-Nov-2024 06:59:16 UTC] Tentative de vérification pour l'email: sophie.martin@example.com
+[29-Nov-2024 06:59:16 UTC] Résultat de la vérification: Utilisateur trouvé
+[29-Nov-2024 06:59:16 UTC] Réponse du contrôleur: {"status":"success","message":"Connexion r\u00e9ussie","result":{"utilisateur":{"UtilisateurID":2,"Email":"sophie.martin@example.com","Nom":"Martin","Prenom":"Sophie","Type":"technicien"}}}
+[29-Nov-2024 06:59:16 UTC] Nouvelle requête - Méthode: GET, Action: get_technicien_interventions

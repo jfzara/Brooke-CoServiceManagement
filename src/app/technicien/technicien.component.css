@@ -1,276 +1,86 @@
-.titreCalendrier {
-  margin-top: 3rem;
-  font-size: 1.5rem;
-  font-weight: bold;
-  text-align: center;
-}
-
 .header {
-  background-color: #ffffff;
-  height: 6rem;
-  width: 100%;
+  background-color: var(--primary-color);
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   position: fixed;
   top: 0;
   left: 0;
+  right: 0;
   z-index: 1000;
-  border-bottom: 1px solid #ddd;
+  box-shadow: var(--shadow);
+}
+
+.header-title {
+  color: var(--white);
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 0;
 }
 
 .app-container {
-  display: flex;
-  margin-top: 30px;
-  background-color: #f0f0f0;
+  margin-top: 5rem;
+  padding: 2rem;
 }
 
-.sidebar {
-  width: 12rem;
-  height: calc(100vh - 30px);
-  background-color: #123456;
-  color: #ffffff;
-  padding: 20px 10px;
-  position: fixed;
-  top: 30px;
-  left: 0;
-  box-sizing: border-box;
-}
-
-.sidebar h2 {
-  font-size: 1.2em;
-  margin-bottom: 2rem;
-}
-
-.sidebar nav ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.sidebar nav a {
-  color: white;
-  text-decoration: none;
-  display: block;
-  padding: 10px;
-  border-radius: 4px;
-  margin-bottom: 10px;
-  transition: background-color 0.3s;
-}
-
-.sidebar nav a:hover {
-  background-color: #4caf50;
-}
-
-.main-content {
-  margin-left: 13rem; /* Ajustement pour éviter chevauchement avec la sidebar */
-  padding: 20px;
-  width: calc(100% - 13rem);
-  margin-top: 7rem; /* Espace pour l'en-tête fixe */
-}
-
-.interventions {
-  padding: 20px;
-}
-
-.titreInterventions {
-  margin-bottom: 2rem;
-  font-size: 1.6rem;
-  font-weight: bold;
-}
-
-.filter-form {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-}
-
-#filter-select {
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  height: 2rem;
-  padding: 0 10px;
-}
-
-.filter-form label {
-  margin-right: 10px;
-}
-
-.add-button {
-  background-color: #FFD700;
-  border-radius: 4px;
-  padding: 10px 20px;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-  color: black;
-  margin-left: 10px;
-}
-
-.add-button:hover {
-  background-color: #e6b800;
-}
-
-.search-bar {
+/* Table Styles */
+.table-container {
+  background: var(--white);
+  border-radius: var(--border-radius);
+  padding: 2rem;
   margin-top: 2rem;
-  width: 50%;
-  margin-bottom: 4rem;
-  height: 2rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  padding-left: 10px;
-  margin-left: -1.3vw;
+  box-shadow: var(--shadow);
 }
 
-
-.interventions-table table {
+table {
   width: 100%;
-  border-collapse: collapse;
-  background-color: white;
-
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
-.interventions-table th,
-.interventions-table td {
-  padding: 12px;
-  border: 1px solid #ccc;
-  text-align: center;
+th {
+  background-color: var(--gray-100);
+  padding: 1.25rem;
+  font-weight: 600;
+  text-align: left;
+  color: var(--primary-color);
 }
 
+td {
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+/* Status Styles */
 .status {
-  display: inline-block;
-  padding: 5px 10px;
-  border-radius: 4px;
-  margin: auto;
-  font-size: 1rem;
-}
-
-.status1 {
-  background-color: #4caf50;
-  color: white;
-}
-
-.status2 {
-  background-color: #e63946;
-  color: white;
-}
-
-.status3 {
-  background-color: #ffeb3b;
-  color: black;
-}
-
-.action-button {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 1rem;
-  color: white;
-  margin-right: 2rem;
-  border: none;
-  cursor: pointer;
-}
-
-.action-green {
-  background-color: #4caf50;
-}
-
-.action-yellow {
-  background-color: #FFD700;
-  color: black;
-}
-
-.action-red {
-  background-color: #e63946;
-}
-
-.action-button:hover {
-  opacity: 0.8;
-}
-
-/* Styles généraux pour FullCalendar */
-.fc {
-  font-family: Arial, sans-serif;
-  background: white;
-  padding-inline: 2vw;
-  padding-top: 2vw;
-  padding-bottom: 2vw;
-  border-radius: 3px;
-}
-
-.titreCalendrier[_ngcontent-ng-c677056016] {
-  margin-top: 3rem;
-  font-size: 1.5rem;
-  font-weight: bold;
-  text-align: start;
-  padding-left: 1rem;
-}
-
-.fc-toolbar {
-  background-color: #123456;
-  color: #ffffff;
-  border-radius: 4px;
-}
-
-.fc-toolbar h2 {
-  font-size: 1.5rem;
-}
-
-.fc-button {
-  background-color: #4caf50;
-  color: white;
-  border: none;
   padding: 0.5rem 1rem;
-  border-radius: 4px;
-  margin: 0 5px;
-}
-
-.fc-button:hover {
-  background-color: #45a049;
-}
-
-.fc-day-grid-container {
-  padding: 10px;
-}
-
-.fc-daygrid-day {
-  background-color: #f9f9f9;
-  border-radius: 4px;
-}
-
-.fc-daygrid-day-number {
-  font-size: 1rem;
-  color: #333;
-  padding: 5px;
-}
-
-.fc-daygrid-day-top {
-  text-align: center;
-  padding: 5px;
-  background-color: #ececec;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-}
-
-.fc-daygrid-event {
-  background-color: #FFD700;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 5px;
-  margin-top: 5px;
-  font-size: 0.8rem;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  display: inline-block;
+  min-width: 120px;
   text-align: center;
 }
 
-.fc-daygrid-day.fc-day-today {
-  background-color: #ffeb3b;
-  border-radius: 4px;
-  font-weight: bold;
+/* Search and Filter Controls */
+.controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
-/* Mise en page */
-.calendar-container {
-  margin-top: 4rem; /* pour laisser de l'espace sous l'en-tête */
-  padding: 20px;
+.search-container,
+.filter-container {
+  flex: 1;
 }
 
-.fc-header-toolbar {
-  margin-bottom: 1rem;
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  table {
+    min-width: 1000px;
+  }
 }

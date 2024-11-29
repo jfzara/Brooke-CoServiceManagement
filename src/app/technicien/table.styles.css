@@ -1,0 +1,111 @@
+/* Table Container */
+.table-container {
+    width: 100%;
+    margin: 2rem 0;
+    overflow-x: auto;
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+  }
+  
+  /* Table Styles */
+  table {
+    width: 100%;
+    min-width: 1200px; /* Ensures table maintains minimum width */
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0;
+  }
+  
+  /* Header Styles */
+  thead {
+    background-color: var(--gray-100);
+  }
+  
+  th {
+    padding: 1.25rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--gray-200);
+    white-space: nowrap;
+  }
+  
+  /* Column Widths */
+  th:nth-child(1) { width: 10%; } /* Date */
+  th:nth-child(2) { width: 12%; } /* Heure */
+  th:nth-child(3) { width: 10%; } /* Client */
+  th:nth-child(4) { width: 15%; } /* Type */
+  th:nth-child(5) { width: 25%; } /* Description */
+  th:nth-child(6) { width: 12%; } /* Statut */
+  th:nth-child(7) { width: 16%; } /* Actions */
+  
+  /* Cell Styles */
+  td {
+    padding: 1.25rem 1rem;
+    border-bottom: 1px solid var(--gray-200);
+    vertical-align: middle;
+  }
+  
+  /* Row Hover Effect */
+  tbody tr:hover {
+    background-color: var(--gray-100);
+  }
+  
+  /* Status Badge Styles */
+  .status {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    text-align: center;
+    min-width: 120px;
+  }
+  
+  .status-pending {
+    background-color: var(--warning-color);
+    color: var(--text-color);
+  }
+  
+  .status-progress {
+    background-color: var(--info-color);
+    color: var(--white);
+  }
+  
+  .status-completed {
+    background-color: var(--success-color);
+    color: var(--white);
+  }
+  
+  /* Actions Column */
+  .actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 1400px) {
+    .table-container {
+      margin: 1rem 0;
+      padding: 1rem;
+    }
+    
+    td, th {
+      padding: 1rem 0.75rem;
+    }
+  }
+  
+  /* Description Text Wrapping */
+  td:nth-child(5) {
+    white-space: normal;
+    min-width: 200px;
+    max-width: 300px;
+  }
+  
+  /* Ensure buttons don't wrap */
+  td:last-child {
+    white-space: nowrap;
+  }
