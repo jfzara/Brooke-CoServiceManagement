@@ -1,5 +1,4 @@
 <?php
-
 require_once __DIR__ . '/../models/UtilisateurModel.php';
 
 class UtilisateurController {
@@ -9,96 +8,82 @@ class UtilisateurController {
         $this->utilisateurModel = new UtilisateurModel();
     }
 
-    public function createUtilisateur($data) {
-        if ($this->utilisateurModel->creerUtilisateur($data)) {
-            return "Utilisateur créé avec succès!";
+    public function connexion($email, $motDePasse) {
+        $utilisateur = $this->utilisateurModel->verifierUtilisateur($email, $motDePasse);
+        
+        if ($utilisateur) {
+            return [
+                'status' => 'success',
+                'message' => 'Connexion réussie',
+                'result' => [
+                    'utilisateur' => [
+                        'UtilisateurID' => $utilisateur['UtilisateurID'],
+                        'Email' => $utilisateur['Email'],
+                        'Nom' => $utilisateur['Nom'],
+                        'Prenom' => $utilisateur['Prenom'],
+                        'Type' => $utilisateur['Type']
+                    ]
+                ]
+            ];
         } else {
-            return "Erreur lors de la création de l'utilisateur.";
+            return [
+                'status' => 'error',
+                'message' => 'Email ou mot de passe incorrect'
+            ];
+        }
+    }
+
+    public function createUtilisateur($data) {
+        try {
+            $result = $this->utilisateurModel->creerUtilisateur($data);
+            return [
+                'status' => $result ? 'success' : 'error',
+                'message' => $result ? 'Utilisateur créé avec succès' : 'Erreur lors de la création'
+            ];
+        } catch (Exception $e) {
+            error_log("Exception dans createUtilisateur: " . $e->getMessage());
+            throw $e;
         }
     }
 
     public function getUtilisateur($id) {
-        $result = $this->utilisateurModel->getUtilisateurById($id);
-        if ($result) {
-            return $result;
-        } else {
-            return "Utilisateur non trouvé.";
+        try {
+            $utilisateur = $this->utilisateurModel->getUtilisateurById($id);
+            return [
+                'status' => $utilisateur ? 'success' : 'error',
+                'result' => $utilisateur ? ['utilisateur' => $utilisateur] : null,
+                'message' => $utilisateur ? null : 'Utilisateur non trouvé'
+            ];
+        } catch (Exception $e) {
+            error_log("Exception dans getUtilisateur: " . $e->getMessage());
+            throw $e;
         }
     }
 
     public function updateUtilisateur($id, $data) {
-        if ($this->utilisateurModel->modifierUtilisateur($id, $data)) {
-            return "Utilisateur mis à jour avec succès!";
-        } else {
-            return "Erreur lors de la mise à jour de l'utilisateur.";
+        try {
+            $result = $this->utilisateurModel->modifierUtilisateur($id, $data);
+            return [
+                'status' => $result ? 'success' : 'error',
+                'message' => $result ? 'Utilisateur mis à jour avec succès' : 'Erreur lors de la mise à jour'
+            ];
+        } catch (Exception $e) {
+            error_log("Exception dans updateUtilisateur: " . $e->getMessage());
+            throw $e;
         }
     }
 
     public function deleteUtilisateur($id) {
-        if ($this->utilisateurModel->supprimerUtilisateur($id)) {
-            return "Utilisateur supprimé avec succès!";
-        } else {
-            return "Erreur lors de la suppression de l'utilisateur.";
+        try {
+            $result = $this->utilisateurModel->supprimerUtilisateur($id);
+            return [
+                'status' => $result ? 'success' : 'error',
+                'message' => $result ? 'Utilisateur supprimé avec succès' : 'Erreur lors de la suppression'
+            ];
+        } catch (Exception $e) {
+            error_log("Exception dans deleteUtilisateur: " . $e->getMessage());
+            throw $e;
         }
     }
-
-    // Ajouter la méthode de connexion 
-    public function connexion($email, $motDePasse) {
-         $utilisateur = $this->utilisateurModel->verifierUtilisateur($email, $motDePasse); 
-         if ($utilisateur) { // Connexion réussie, retourne les informations de l'utilisateur 
-            return [ 
-                'status' => 'success', 
-                'message' => 'Connexion réussie', 
-                'utilisateur' => $utilisateur 
-            ]; 
-        } else { // Échec de la connexion 
-            return [ 
-                'status' => 'error', 
-                'message' => 'Échec de la connexion' 
-            ]; 
-        }
-    }
-
-    public function loginWithFacebook($facebookUser) {
-        // Vérifiez si un utilisateur existe déjà avec le CompteFacebookID ou l'email
-        $utilisateur = $this->utilisateurModel->getUtilisateurByFacebookID($facebookUser['id']);
-        
-        if (!$utilisateur) {
-            // L'utilisateur n'existe pas, on le crée
-            $data = [
-                'Nom' => $facebookUser['name'],  // Vous pouvez diviser le nom complet si nécessaire
-                'Prenom' => '',                  // Facebook ne fournit pas toujours le prénom séparé
-                'Email' => $facebookUser['email'],
-                'MotDePasse' => '',              // Pas nécessaire, car l'authentification se fait via Facebook
-                'Type' => 'facebook',            // Vous pouvez avoir un type pour l'authentification
-                'CompteGoogleID' => null,
-                'CompteFacebookID' => $facebookUser['id'],
-                'CompteBrookeID' => null,
-            ];
-    
-            $result = $this->utilisateurModel->creerUtilisateur($data);
-    
-            if ($result) {
-                return [ 
-                    'status' => 'success',
-                    'message' => 'Utilisateur créé avec succès avec Facebook',
-                    'utilisateur' => $data
-                ];
-            } else {
-                return [
-                    'status' => 'error',
-                    'message' => 'Erreur lors de la création de l\'utilisateur avec Facebook'
-                ];
-            }
-        } else {
-            // L'utilisateur existe déjà, on renvoie ses informations
-            return [ 
-                'status' => 'success',
-                'message' => 'Connexion réussie avec Facebook',
-                'utilisateur' => $utilisateur 
-            ];
-        }
-    }    
 }
-
 ?>

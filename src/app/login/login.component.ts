@@ -24,36 +24,40 @@ export class LoginComponent implements OnInit {
     this.userService.initFacebookSDK();
   }
 
-  // Méthode pour soumettre le formulaire de connexion
   onSubmit(): void {
     if (this.email && this.password) {
       const data = {
-        email : this.email,
-        motDePasse : this.password
-      }
-      // Appeler le service login avec les données du formulaire
+        email: this.email,
+        motDePasse: this.password
+      };
+      
       this.userService.login(data).subscribe({
         next: (response) => {
-          console.log(response)
-          // On redirige l'utilisateur après une connexion réussie (si nécessaire)
-          if(response.result.utilisateur){
+          console.log('Réponse du serveur:', response);
+          if (response.status === 'success' && response.result?.utilisateur) {
             const user = response.result.utilisateur;
-            if(user.Type === "prepose"){
-              console.log("Prepose " + user.Email + " connecte!")
-              this.router.navigate(['/prepose']);
-            } else if(user.Type === "technicien"){
-              console.log("Technicien " + user.Email + " connecte!")
-              this.router.navigate(['/technicien']);
-            } else if(user.Type === "client"){
-              console.log("Client " + user.Email + " connecte!")
+            switch (user.Type.toLowerCase()) {
+              case 'prepose':
+                console.log(`Prepose ${user.Email} connecté!`);
+                this.router.navigate(['/prepose']);
+                break;
+              case 'technicien':
+                console.log(`Technicien ${user.Email} connecté!`);
+                this.router.navigate(['/technicien']);
+                break;
+              case 'client':
+                console.log(`Client ${user.Email} connecté!`);
+                break;
+              default:
+                this.router.navigate(['/']);
             }
+          } else {
+            this.errorMessage = response.message || 'Erreur de connexion';
           }
-          //this.router.navigate(['/dashboard']); // Remplace 'dashboard' par la route désirée
         },
         error: (err) => {
-          console.log(err)
-          // Si une erreur se produit, afficher un message d'erreur
-          this.errorMessage = 'Identifiants invalides. Veuillez réessayer.';
+          console.error('Erreur de connexion:', err);
+          this.errorMessage = err.message || 'Identifiants invalides. Veuillez réessayer.';
         }
       });
     } else {
@@ -65,38 +69,42 @@ export class LoginComponent implements OnInit {
     console.log("Connexion avec Facebook");
     this.userService.loginWithFacebook().then(authResponse => {
       console.log(authResponse);
-  
-      // Récupérer le token d'accès de Facebook
       const accessToken = authResponse.accessToken;
-  
-      // Envoi du token au backend pour validation et création de la session
+      
       this.userService.loginWithFacebookToken(accessToken).subscribe(
         (response: any) => {
           console.log('Utilisateur connecté avec succès:', response);
-          // Gérer la réponse du serveur ici (par exemple, stocker les informations de l'utilisateur ou rediriger)
-          // On redirige l'utilisateur après une connexion réussie (si nécessaire)
-          if(response.utilisateur){
-            const user = response.utilisateur;
-            if(user.Type === "prepose"){
-              console.log("Prepose " + user.Email + " connecte!")
-              this.router.navigate(['/prepose']);
-            } else if(user.Type === "technicien"){
-              console.log("Technicien " + user.Email + " connecte!")
-              this.router.navigate(['/technicien']);
-            } else if(user.Type === "client"){
-              console.log("Client " + user.Email + " connecte!")
+          if (response.status === 'success' && response.result?.utilisateur) {
+            const user = response.result.utilisateur;
+            switch (user.Type.toLowerCase()) {
+              case 'prepose':
+                console.log(`Prepose ${user.Email} connecté!`);
+                this.router.navigate(['/prepose']);
+                break;
+              case 'technicien':
+                console.log(`Technicien ${user.Email} connecté!`);
+                this.router.navigate(['/technicien']);
+                break;
+              case 'client':
+                console.log(`Client ${user.Email} connecté!`);
+                break;
+              default:
+                this.router.navigate(['/']);
             }
+          } else {
+            this.errorMessage = response.message || 'Erreur lors de la connexion avec Facebook';
           }
         },
         (error) => {
           console.error('Erreur lors de la connexion au serveur:', error);
+          this.errorMessage = 'Erreur lors de la connexion avec Facebook';
         }
       );
-      
     }).catch(error => {
       console.error('Error logging in:', error);
+      this.errorMessage = 'Erreur lors de la connexion avec Facebook';
     });
-  } 
+  }
 
   loginGoogle() {
     console.log('Method not implemented.');

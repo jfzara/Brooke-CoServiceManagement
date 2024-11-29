@@ -1,0 +1,76 @@
+[29-Nov-2024 01:27:34 UTC] Nouvelle requête - Méthode: POST, Action: login
+[29-Nov-2024 01:27:34 UTC] Données de login reçues: {"email":"sophie.martin@example.com","motDePasse":"password123"}
+[29-Nov-2024 01:27:34 UTC] Connexion à la base de données réussie
+[29-Nov-2024 01:27:34 UTC] Tentative de vérification pour l'email: sophie.martin@example.com
+[29-Nov-2024 01:27:34 UTC] Résultat de la vérification: Utilisateur trouvé
+[29-Nov-2024 01:27:34 UTC] Réponse du contrôleur: {"status":"success","message":"Connexion r\u00e9ussie","data":{"user":{"id":2,"email":"sophie.martin@example.com","nom":"Martin","prenom":"Sophie","type":"technicien"}}}
+[29-Nov-2024 01:49:20 UTC] Nouvelle requête - Méthode: POST, Action: login
+[29-Nov-2024 01:49:20 UTC] Données de login reçues: {"email":"sophie.martin@example.com","motDePasse":"password123"}
+[29-Nov-2024 01:49:20 UTC] Connexion à la base de données réussie
+[29-Nov-2024 01:49:20 UTC] Tentative de connexion pour: sophie.martin@example.com
+[29-Nov-2024 01:49:20 UTC] Tentative de vérification pour l'email: sophie.martin@example.com
+[29-Nov-2024 01:49:20 UTC] Résultat de la vérification: Utilisateur trouvé
+[29-Nov-2024 01:49:20 UTC] Connexion réussie pour: sophie.martin@example.com
+[29-Nov-2024 01:49:20 UTC] Réponse du contrôleur: {"status":"success","message":"Connexion r\u00e9ussie","result":{"utilisateur":{"id":2,"email":"sophie.martin@example.com","nom":"Martin","prenom":"Sophie","type":"technicien"}}}
+[29-Nov-2024 01:49:41 UTC] Nouvelle requête - Méthode: POST, Action: login
+[29-Nov-2024 01:49:41 UTC] Données de login reçues: {"email":"sophie.martin@example.com","motDePasse":"password123"}
+[29-Nov-2024 01:49:41 UTC] Connexion à la base de données réussie
+[29-Nov-2024 01:49:41 UTC] Tentative de connexion pour: sophie.martin@example.com
+[29-Nov-2024 01:49:41 UTC] Tentative de vérification pour l'email: sophie.martin@example.com
+[29-Nov-2024 01:49:41 UTC] Résultat de la vérification: Utilisateur trouvé
+[29-Nov-2024 01:49:41 UTC] Connexion réussie pour: sophie.martin@example.com
+[29-Nov-2024 01:49:41 UTC] Réponse du contrôleur: {"status":"success","message":"Connexion r\u00e9ussie","result":{"utilisateur":{"id":2,"email":"sophie.martin@example.com","nom":"Martin","prenom":"Sophie","type":"technicien"}}}
+[29-Nov-2024 01:49:53 UTC] Nouvelle requête - Méthode: POST, Action: login
+[29-Nov-2024 01:49:53 UTC] Données de login reçues: {"email":"sophie.martin@example.com","motDePasse":"password123"}
+[29-Nov-2024 01:49:53 UTC] Connexion à la base de données réussie
+[29-Nov-2024 01:49:53 UTC] Tentative de connexion pour: sophie.martin@example.com
+[29-Nov-2024 01:49:53 UTC] Tentative de vérification pour l'email: sophie.martin@example.com
+[29-Nov-2024 01:49:53 UTC] Résultat de la vérification: Utilisateur trouvé
+[29-Nov-2024 01:49:53 UTC] Connexion réussie pour: sophie.martin@example.com
+[29-Nov-2024 01:49:53 UTC] Réponse du contrôleur: {"status":"success","message":"Connexion r\u00e9ussie","result":{"utilisateur":{"id":2,"email":"sophie.martin@example.com","nom":"Martin","prenom":"Sophie","type":"technicien"}}}
+[29-Nov-2024 01:53:59 UTC] Nouvelle requête - Méthode: POST, Action: login
+[29-Nov-2024 01:53:59 UTC] Données de login reçues: {"email":"sophie.martin@example.com","motDePasse":"password123"}
+[29-Nov-2024 01:53:59 UTC] Connexion à la base de données réussie
+[29-Nov-2024 01:53:59 UTC] Tentative de connexion pour: sophie.martin@example.com
+[29-Nov-2024 01:53:59 UTC] Tentative de vérification pour l'email: sophie.martin@example.com
+[29-Nov-2024 01:53:59 UTC] Résultat de la vérification: Utilisateur trouvé
+[29-Nov-2024 01:53:59 UTC] Connexion réussie pour: sophie.martin@example.com
+[29-Nov-2024 01:53:59 UTC] Réponse du contrôleur: {"status":"success","message":"Connexion r\u00e9ussie","result":{"utilisateur":{"id":2,"email":"sophie.martin@example.com","nom":"Martin","prenom":"Sophie","type":"technicien"}}}
+[29-Nov-2024 01:56:11 UTC] Nouvelle requête - Méthode: POST, Action: login
+[29-Nov-2024 01:56:11 UTC] Données de login reçues: {"email":"sophie.martin@example.com","motDePasse":"password123"}
+[29-Nov-2024 01:56:11 UTC] Connexion à la base de données réussie
+[29-Nov-2024 01:56:11 UTC] Tentative de connexion pour: sophie.martin@example.com
+[29-Nov-2024 01:56:11 UTC] Tentative de vérification pour l'email: sophie.martin@example.com
+[29-Nov-2024 01:56:11 UTC] Résultat de la vérification: Utilisateur trouvé
+[29-Nov-2024 01:56:11 UTC] Connexion réussie pour: sophie.martin@example.com
+[29-Nov-2024 01:56:11 UTC] Réponse du contrôleur: {"status":"success","message":"Connexion r\u00e9ussie","result":{"utilisateur":{"id":2,"email":"sophie.martin@example.com","nom":"Martin","prenom":"Sophie","type":"technicien"}}}
+[29-Nov-2024 02:34:39 UTC] Nouvelle requête - Méthode: POST, Action: login
+[29-Nov-2024 02:34:39 UTC] Données de login reçues: {"email":"sophie.martin@example.com","motDePasse":"password123"}
+[29-Nov-2024 02:34:39 UTC] Connexion à la base de données réussie
+[29-Nov-2024 02:34:39 UTC] Tentative de vérification pour l'email: sophie.martin@example.com
+[29-Nov-2024 02:34:39 UTC] Résultat de la vérification: Utilisateur trouvé
+[29-Nov-2024 02:34:39 UTC] Réponse du contrôleur: {"status":"success","message":"Connexion r\u00e9ussie","result":{"utilisateur":{"UtilisateurID":2,"Email":"sophie.martin@example.com","Nom":"Martin","Prenom":"Sophie","Type":"technicien"}}}
+[29-Nov-2024 02:34:51 UTC] Nouvelle requête - Méthode: POST, Action: login
+[29-Nov-2024 02:34:51 UTC] Données de login reçues: {"email":"sophie.martin@example.com","motDePasse":"password123"}
+[29-Nov-2024 02:34:51 UTC] Connexion à la base de données réussie
+[29-Nov-2024 02:34:51 UTC] Tentative de vérification pour l'email: sophie.martin@example.com
+[29-Nov-2024 02:34:51 UTC] Résultat de la vérification: Utilisateur trouvé
+[29-Nov-2024 02:34:51 UTC] Réponse du contrôleur: {"status":"success","message":"Connexion r\u00e9ussie","result":{"utilisateur":{"UtilisateurID":2,"Email":"sophie.martin@example.com","Nom":"Martin","Prenom":"Sophie","Type":"technicien"}}}
+[29-Nov-2024 02:34:54 UTC] Nouvelle requête - Méthode: POST, Action: login
+[29-Nov-2024 02:34:54 UTC] Données de login reçues: {"email":"sophie.martin@example.com","motDePasse":"password123"}
+[29-Nov-2024 02:34:54 UTC] Connexion à la base de données réussie
+[29-Nov-2024 02:34:54 UTC] Tentative de vérification pour l'email: sophie.martin@example.com
+[29-Nov-2024 02:34:54 UTC] Résultat de la vérification: Utilisateur trouvé
+[29-Nov-2024 02:34:54 UTC] Réponse du contrôleur: {"status":"success","message":"Connexion r\u00e9ussie","result":{"utilisateur":{"UtilisateurID":2,"Email":"sophie.martin@example.com","Nom":"Martin","Prenom":"Sophie","Type":"technicien"}}}
+[29-Nov-2024 02:35:07 UTC] Nouvelle requête - Méthode: POST, Action: login
+[29-Nov-2024 02:35:07 UTC] Données de login reçues: {"email":"sophie.martin@example.com","motDePasse":"password123"}
+[29-Nov-2024 02:35:07 UTC] Connexion à la base de données réussie
+[29-Nov-2024 02:35:07 UTC] Tentative de vérification pour l'email: sophie.martin@example.com
+[29-Nov-2024 02:35:07 UTC] Résultat de la vérification: Utilisateur trouvé
+[29-Nov-2024 02:35:07 UTC] Réponse du contrôleur: {"status":"success","message":"Connexion r\u00e9ussie","result":{"utilisateur":{"UtilisateurID":2,"Email":"sophie.martin@example.com","Nom":"Martin","Prenom":"Sophie","Type":"technicien"}}}
+[29-Nov-2024 02:35:11 UTC] Nouvelle requête - Méthode: POST, Action: login
+[29-Nov-2024 02:35:11 UTC] Données de login reçues: {"email":"sophie.martin@example.com","motDePasse":"password123"}
+[29-Nov-2024 02:35:11 UTC] Connexion à la base de données réussie
+[29-Nov-2024 02:35:11 UTC] Tentative de vérification pour l'email: sophie.martin@example.com
+[29-Nov-2024 02:35:11 UTC] Résultat de la vérification: Utilisateur trouvé
+[29-Nov-2024 02:35:11 UTC] Réponse du contrôleur: {"status":"success","message":"Connexion r\u00e9ussie","result":{"utilisateur":{"UtilisateurID":2,"Email":"sophie.martin@example.com","Nom":"Martin","Prenom":"Sophie","Type":"technicien"}}}

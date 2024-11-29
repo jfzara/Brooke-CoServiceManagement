@@ -1,35 +1,35 @@
 <?php
-$servername = "localhost";
-$username = "root";  
-$password = "";      
-$dbname = "brookeandco";
+// backend/config/database.php
+$host = 'localhost';
+$dbname = 'brookeandco';
+$username = 'root';
+$password = '';
 
-// Création de la connexion sans spécifier la base de données
-$conn = new mysqli($servername, $username, $password);
+try {
+    // Créer une connexion sans spécifier la base de données
+    $conn = new mysqli($host, $username, $password);
+    
+    if ($conn->connect_error) {
+        throw new Exception("Erreur de connexion: " . $conn->connect_error);
+    }
 
-// Vérification de la connexion
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    // Vérifier si la base de données existe
+    $result = $conn->query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '$dbname'");
+    
+    if ($result->num_rows === 0) {
+        // Créer la base de données si elle n'existe pas
+        if ($conn->query("CREATE DATABASE IF NOT EXISTS $dbname") === TRUE) {
+            error_log("Base de données créée avec succès");
+        } else {
+            throw new Exception("Erreur lors de la création de la base de données: " . $conn->error);
+        }
+    }
+
+    // Se connecter à la base de données
+    $conn->select_db($dbname);
+
+} catch (Exception $e) {
+    error_log("Erreur database.php: " . $e->getMessage());
+    die($e->getMessage());
 }
-
-// Suppression de la base de données si elle existe
-$sql = "DROP DATABASE IF EXISTS $dbname";
-if ($conn->query($sql) === TRUE) {
-    echo "Base de données supprimée avec succès<br/>";
-} else {
-    echo "Erreur lors de la suppression de la base de données: " . $conn->error . "<br/>";
-}
-
-// Création de la base de données
-$sql = "CREATE DATABASE $dbname";
-if ($conn->query($sql) === TRUE) {
-    echo "Base de données créée avec succès<br/>";
-} else {
-    echo "Erreur lors de la création de la base de données: " . $conn->error;
-    die();
-}
-
-// Sélection de la base de données
-$conn->select_db($dbname);
-
 ?>
