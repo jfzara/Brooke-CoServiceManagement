@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
+import { AuthService, User } from './auth.service';
 
-// Types Facebook
 declare global {
   interface Window {
     FB: {
@@ -19,24 +19,12 @@ declare global {
   }
 }
 
-// Types pour l'API
 interface LoginResponse {
   status: string;
   message: string;
   result?: {
-    utilisateur: {
-      UtilisateurID: number;
-      Email: string;
-      Nom: string;
-      Prenom: string;
-      Type: string;
-    }
+    utilisateur: User;
   };
-}
-
-interface LoginData {
-  email: string;
-  motDePasse: string;
 }
 
 @Injectable({
@@ -46,24 +34,23 @@ export class UserService {
   private apiUrl = 'http://localhost:8000/api.php';
   private readonly fbAppId = '931570492178940';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
-  public login(data: LoginData): Observable<LoginResponse> {
+  public login(data: { email: string, motDePasse: string }): Observable<LoginResponse> {
     console.log("Tentative de connexion avec:", data);
     return this.http.post<LoginResponse>(`${this.apiUrl}?action=login`, data).pipe(
-      map((response: LoginResponse) => {
+      tap((response: LoginResponse) => {
         console.log("Réponse du serveur:", response);
-        if (response.status === 'error') {
-          throw new Error(response.message);
+        if (response.status === 'success' && response.result?.utilisateur) {
+          this.authService.setCurrentUser(response.result.utilisateur);
         }
-        return response;
       }),
       catchError(error => {
         console.error('Une erreur est survenue:', error);
-        if (error.error?.message) {
-          throw new Error(error.error.message);
-        }
-        throw new Error('Une erreur est survenue lors de la connexion');
+        throw error.error?.message || 'Une erreur est survenue lors de la connexion';
       })
     );
   }
@@ -101,12 +88,14 @@ export class UserService {
 
   public loginWithFacebookToken(token: string): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiUrl}?action=login_facebook`, { token }).pipe(
+      tap((response: LoginResponse) => {
+        if (response.status === 'success' && response.result?.utilisateur) {
+          this.authService.setCurrentUser(response.result.utilisateur);
+        }
+      }),
       catchError(error => {
         console.error('Erreur lors de la connexion avec Facebook:', error);
-        if (error.error?.message) {
-          throw new Error(error.error.message);
-        }
-        throw new Error('Erreur lors de la connexion avec Facebook');
+        throw error.error?.message || 'Erreur lors de la connexion avec Facebook';
       })
     );
   }

@@ -1,33 +1,32 @@
 <?php
-// Setup response headers
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-// Enable error logging
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 error_reporting(E_ALL);
 ini_set('error_log', __DIR__ . '/php_errors.log');
 
-// Handle preflight requests
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
-// Include controllers
 require_once '../app/controllers/UtilisateurController.php';
+require_once '../app/controllers/TechnicienController.php';
 
 try {
-    // Log request details
     error_log("Nouvelle requête - Méthode: " . $_SERVER['REQUEST_METHOD'] . ", Action: " . ($_GET['action'] ?? 'non définie'));
     
     $requestMethod = $_SERVER['REQUEST_METHOD'];
     $action = isset($_GET['action']) ? $_GET['action'] : '';
 
     switch ($requestMethod) {
+        case 'GET':
+            handleGetRequest($action);
+            break;
         case 'POST':
             handlePostRequest($action);
             break;
@@ -37,6 +36,35 @@ try {
 } catch (Exception $e) {
     error_log("Exception globale: " . $e->getMessage());
     sendJsonResponse(['status' => 'error', 'message' => $e->getMessage()], 500);
+}
+
+function handleGetRequest($action) {
+    try {
+        switch ($action) {
+            case 'get_technicien_interventions':
+                if (!isset($_GET['technicienId'])) {
+                    sendJsonResponse([
+                        'status' => 'error',
+                        'message' => 'ID du technicien manquant'
+                    ], 400);
+                    return;
+                }
+                
+                $technicienController = new TechnicienController();
+                $response = $technicienController->getTechnicienInterventions($_GET['technicienId']);
+                sendJsonResponse($response);
+                break;
+
+            default:
+                sendJsonResponse([
+                    'status' => 'error',
+                    'message' => 'Action non reconnue'
+                ], 404);
+        }
+    } catch (Exception $e) {
+        error_log("Exception dans handleGetRequest: " . $e->getMessage());
+        throw $e;
+    }
 }
 
 function handlePostRequest($action) {

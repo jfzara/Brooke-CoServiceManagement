@@ -57,6 +57,15 @@ class InterventionController {
             return "Erreur lors de la mise à jour du statut de l'intervention ou transition invalide.";
         }
     }
+
+    public function getInterventionsByTechnicien($technicienId) {
+        $interventions = $this->interventionModel->getInterventionsByTechnicien($technicienId);
+        return [
+            'status' => 'success',
+            'data' => $interventions
+        ];
+    }
+
 }
 
 ?>

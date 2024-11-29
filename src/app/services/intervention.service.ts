@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environment';
 
 export interface Intervention {
   InterventionID?: number;
@@ -48,27 +47,31 @@ export const getStatusColor = (status: string): string => {
   providedIn: 'root'
 })
 export class InterventionService {
-  private apiUrl = `${environment.apiUrl}/interventions`;
+  private apiUrl = 'http://localhost:8000/api.php';
 
   constructor(private http: HttpClient) { }
 
-  getPlanningByTechnicienWithMoreInfos(technicienId: number): Observable<Intervention[]> {
-    return this.http.get<Intervention[]>(`${this.apiUrl}/technicien/${technicienId}`);
+  getTechnicienInterventions(technicienId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}?action=get_technicien_interventions&technicienId=${technicienId}`);
+  }
+
+  getPlanningByTechnicienWithMoreInfos(technicienId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}?action=get_technicien_interventions&technicienId=${technicienId}`);
   }
 
   updateStatusIntervention(data: { InterventionID: number, StatutIntervention: string }): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${data.InterventionID}/status`, data);
+    return this.http.post(`${this.apiUrl}?action=update_intervention_status`, data);
   }
 
-  getInterventionById(id: number): Observable<Intervention> {
-    return this.http.get<Intervention>(`${this.apiUrl}/${id}`);
+  getInterventionById(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}?action=get_intervention&id=${id}`);
   }
 
   updateIntervention(id: number, data: Partial<Intervention>): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}`, data);
+    return this.http.post(`${this.apiUrl}?action=update_intervention`, { id, ...data });
   }
 
   deleteIntervention(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    return this.http.delete(`${this.apiUrl}?action=delete_intervention&id=${id}`);
   }
 }

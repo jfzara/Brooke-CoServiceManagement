@@ -145,6 +145,28 @@ class InterventionModel {
             return $planningTechnicienModel->updateCommentaire($description, $id);
         }
         return $stmt->affected_rows > 0;
-    }    
+    }   
+    
+    public function getInterventionsByTechnicien($technicienId) {
+        $query = "SELECT i.*, c.Nom as ClientNom, c.Prenom as ClientPrenom 
+                  FROM Intervention i
+                  LEFT JOIN Client c ON i.ClientID = c.ClientID
+                  WHERE i.TechnicienID = ?
+                  ORDER BY i.DebutIntervention ASC";
+                  
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param('i', $technicienId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        $interventions = [];
+        while ($row = $result->fetch_assoc()) {
+            $interventions[] = $row;
+        }
+        
+        return $interventions;
+    }
+
+
 }
 ?>
