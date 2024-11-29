@@ -1,23 +1,41 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 
 export interface User {
-  UtilisateurID: number;
+  id?: number;
+  UtilisateurID?: number;
   Email: string;
-  Nom: string;
-  Prenom: string;
-  Type: string;
+  Nom?: string;
+  Prenom?: string;
+  Type?: string;
   technicienId?: number;
+}
+
+export interface LoginResponse {
+  status: string;
+  message: string;
+  result?: {
+    utilisateur: {
+      UtilisateurID: number;
+      Email: string;
+      Nom: string;
+      Prenom: string;
+      Type: string;
+    };
+  };
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private apiUrl = 'http://localhost:8000/api.php';
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser: Observable<User | null>;
 
-  constructor() {
+  constructor(private http: HttpClient) {
     const storedUser = localStorage.getItem('currentUser');
     this.currentUserSubject = new BehaviorSubject<User | null>(storedUser ? JSON.parse(storedUser) : null);
     this.currentUser = this.currentUserSubject.asObservable();
@@ -27,19 +45,44 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  setCurrentUser(user: User) {
-    // Si l'utilisateur est un technicien, on récupère son ID de technicien
-    if (user.Type.toLowerCase() === 'technicien') {
-      // Logique pour récupérer l'ID du technicien si nécessaire
-      // Pour l'instant, on utilise l'ID utilisateur
-      user.technicienId = user.UtilisateurID;
-    }
-    
-    localStorage.setItem('currentUser', JSON.stringify(user));
-    this.currentUserSubject.next(user);
+  login(email: string, password: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}?action=login`, { 
+      email, 
+      motDePasse: password 
+    }).pipe(
+      tap(response => {
+        if (response.status === 'success' && response.result?.utilisateur) {
+          const utilisateur = response.result.utilisateur;
+          const user: User = {
+            ...utilisateur,
+            technicienId: utilisateur.Type?.toLowerCase() === 'technicien' ? 
+              utilisateur.UtilisateurID : undefined
+          };
+          localStorage.setItem('currentUser', JSON.stringify(user));
+          this.currentUserSubject.next(user);
+        }
+      })
+    );
   }
 
-  logout() {
+  loginWithFacebook(token: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}?action=login_facebook`, { token }).pipe(
+      tap(response => {
+        if (response.status === 'success' && response.result?.utilisateur) {
+          const utilisateur = response.result.utilisateur;
+          const user: User = {
+            ...utilisateur,
+            technicienId: utilisateur.Type?.toLowerCase() === 'technicien' ? 
+              utilisateur.UtilisateurID : undefined
+          };
+          localStorage.setItem('currentUser', JSON.stringify(user));
+          this.currentUserSubject.next(user);
+        }
+      })
+    );
+  }
+
+  logout(): void {
     localStorage.removeItem('currentUser');
     this.currentUserSubject.next(null);
   }
@@ -48,7 +91,7 @@ export class AuthService {
     return !!this.currentUserValue;
   }
 
-  isTechnicien(): boolean {
-    return this.currentUserValue?.Type.toLowerCase() === 'technicien';
+  hasRole(role: string): boolean {
+    return this.currentUserValue?.Type?.toLowerCase() === role.toLowerCase();
   }
 }

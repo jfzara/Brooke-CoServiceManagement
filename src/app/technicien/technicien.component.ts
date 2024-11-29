@@ -9,24 +9,7 @@ import { CalendarOptions } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import frLocale from '@fullcalendar/core/locales/fr';
-
-export interface Intervention {
-  InterventionID: number;
-  TechnicienID: number;
-  ClientID: number;
-  TypeIntervention: string;
-  Description: string;
-  DebutIntervention: string;
-  FinIntervention: string;
-  StatutIntervention: string;
-  Commentaires: string;
-  client?: {
-    Nom: string;
-    Prenom: string;
-    Adresse: string;
-    Telephone: string;
-  };
-}
+import { Intervention, STATUS_TYPES, getStatusColor } from '../models/intervention.model';
 
 @Component({
   selector: 'app-technicien',
@@ -48,12 +31,7 @@ export class TechnicienComponent implements OnInit {
   loading = false;
   error = '';
 
-  readonly STATUS_TYPES = {
-    PENDING: 'En attente',
-    IN_PROGRESS: 'En cours',
-    COMPLETED: 'Terminé',
-    CANCELLED: 'Annulé'
-  };
+  readonly STATUS_TYPES = STATUS_TYPES;
 
   calendarOptions: CalendarOptions = {
     locale: frLocale,
@@ -76,36 +54,47 @@ export class TechnicienComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    console.log('TechnicienComponent initialized');
     this.loadInterventions();
   }
 
   private loadInterventions() {
     const currentUser = this.authService.currentUserValue;
+    console.log('Current user:', currentUser);
+    
     if (!currentUser?.technicienId) {
       this.error = 'Utilisateur non connecté ou non technicien';
+      console.error('No technicienId found:', currentUser);
       return;
     }
 
     this.loading = true;
     this.error = '';
 
+    console.log('Fetching interventions for technicienId:', currentUser.technicienId);
+
     this.interventionService.getTechnicienInterventions(currentUser.technicienId)
       .subscribe({
         next: (response) => {
-          if (response.status === 'success') {
+          console.log('API Response:', response);
+          if (response.status === 'success' && response.data) {
             this.interventions = response.data;
+            console.log('Interventions loaded:', this.interventions);
             this.updateFilteredInterventions();
             this.updateCalendarEvents();
           } else {
             this.error = response.message || 'Erreur lors du chargement des interventions';
+            console.error('API Error:', response);
           }
         },
         error: (error) => {
           this.error = 'Erreur lors du chargement des interventions: ' + error;
+          console.error('HTTP Error:', error);
           this.loading = false;
         },
         complete: () => {
           this.loading = false;
+          console.log('Request completed');
         }
       });
   }
@@ -122,6 +111,7 @@ export class TechnicienComponent implements OnInit {
 
       return matchesSearch && matchesFilter;
     });
+    console.log('Filtered interventions:', this.filteredInterventions);
   }
 
   updateCalendarEvents() {
@@ -131,23 +121,9 @@ export class TechnicienComponent implements OnInit {
         title: `${intervention.TypeIntervention} - ${intervention.client?.Nom || 'Client ' + intervention.ClientID}`,
         start: intervention.DebutIntervention,
         end: intervention.FinIntervention,
-        backgroundColor: this.getStatusColor(intervention.StatutIntervention)
+        backgroundColor: getStatusColor(intervention.StatutIntervention)
       }));
-  }
-
-  getStatusColor(status: string): string {
-    switch (status.toLowerCase()) {
-      case this.STATUS_TYPES.PENDING.toLowerCase():
-        return '#FFD700';
-      case this.STATUS_TYPES.IN_PROGRESS.toLowerCase():
-        return '#4CAF50';
-      case this.STATUS_TYPES.COMPLETED.toLowerCase():
-        return '#2196F3';
-      case this.STATUS_TYPES.CANCELLED.toLowerCase():
-        return '#f44336';
-      default:
-        return '#9E9E9E';
-    }
+    console.log('Calendar events updated:', this.calendarOptions.events);
   }
 
   onSearch(event: any) {
@@ -161,18 +137,18 @@ export class TechnicienComponent implements OnInit {
   }
 
   startIntervention(intervention: Intervention) {
-    intervention.StatutIntervention = this.STATUS_TYPES.IN_PROGRESS;
+    intervention.StatutIntervention = STATUS_TYPES.IN_PROGRESS;
     this.updateFilteredInterventions();
   }
 
   completeIntervention(intervention: Intervention) {
-    intervention.StatutIntervention = this.STATUS_TYPES.COMPLETED;
+    intervention.StatutIntervention = STATUS_TYPES.COMPLETED;
     this.updateFilteredInterventions();
   }
 
   cancelIntervention(intervention: Intervention) {
     if (confirm('Êtes-vous sûr de vouloir annuler cette intervention ?')) {
-      intervention.StatutIntervention = this.STATUS_TYPES.CANCELLED;
+      intervention.StatutIntervention = STATUS_TYPES.CANCELLED;
       this.updateFilteredInterventions();
     }
   }

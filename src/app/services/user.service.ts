@@ -1,8 +1,8 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
-import { AuthService, User } from './auth.service';
+import { HttpClient } from '@angular/common/http';
+import { Observable, from } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { AuthService, LoginResponse } from './auth.service';
 
 declare global {
   interface Window {
@@ -19,45 +19,23 @@ declare global {
   }
 }
 
-interface LoginResponse {
-  status: string;
-  message: string;
-  result?: {
-    utilisateur: User;
-  };
-}
-
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://localhost:8000/api.php';
   private readonly fbAppId = '931570492178940';
 
   constructor(
-    private http: HttpClient,
     private authService: AuthService
   ) {}
 
-  public login(data: { email: string, motDePasse: string }): Observable<LoginResponse> {
-    console.log("Tentative de connexion avec:", data);
-    return this.http.post<LoginResponse>(`${this.apiUrl}?action=login`, data).pipe(
-      tap((response: LoginResponse) => {
-        console.log("Réponse du serveur:", response);
-        if (response.status === 'success' && response.result?.utilisateur) {
-          this.authService.setCurrentUser(response.result.utilisateur);
-        }
-      }),
-      catchError(error => {
-        console.error('Une erreur est survenue:', error);
-        throw error.error?.message || 'Une erreur est survenue lors de la connexion';
-      })
-    );
+  public login(credentials: { email: string; motDePasse: string }): Observable<LoginResponse> {
+    return this.authService.login(credentials.email, credentials.motDePasse);
   }
 
   public initFacebookSDK(): void {
     if (typeof window.FB === 'undefined') {
-      console.error('Facebook SDK is not loaded yet');
+      console.error('Facebook SDK non chargé');
       setTimeout(() => this.initFacebookSDK(), 1000);
       return;
     }
@@ -69,7 +47,7 @@ export class UserService {
       version: 'v21.0'
     });
 
-    console.log('Facebook SDK initialized');
+    console.log('Facebook SDK initialisé');
   }
 
   public loginWithFacebook(): Promise<any> {
@@ -79,7 +57,6 @@ export class UserService {
           console.log('Connexion réussie avec Facebook');
           resolve(response.authResponse);
         } else {
-          console.log('L\'utilisateur a annulé la connexion ou il y a eu une erreur.');
           reject('L\'utilisateur a annulé la connexion ou il y a eu une erreur.');
         }
       }, { scope: 'public_profile,email' });
@@ -87,17 +64,7 @@ export class UserService {
   }
 
   public loginWithFacebookToken(token: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}?action=login_facebook`, { token }).pipe(
-      tap((response: LoginResponse) => {
-        if (response.status === 'success' && response.result?.utilisateur) {
-          this.authService.setCurrentUser(response.result.utilisateur);
-        }
-      }),
-      catchError(error => {
-        console.error('Erreur lors de la connexion avec Facebook:', error);
-        throw error.error?.message || 'Erreur lors de la connexion avec Facebook';
-      })
-    );
+    return this.authService.loginWithFacebook(token);
   }
 
   public getUserInfo(): Promise<any> {
@@ -106,7 +73,6 @@ export class UserService {
         if (response && !response.error) {
           resolve(response);
         } else {
-          console.error('Erreur lors de l\'obtention des informations de l\'utilisateur:', response.error);
           reject('Échec de la récupération des informations utilisateur');
         }
       });

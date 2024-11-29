@@ -30,27 +30,35 @@ class TechnicienModel {
 
     public function getInterventions($technicienId) {
         try {
-            $query = "SELECT i.*, c.Nom as ClientNom, c.Prenom as ClientPrenom, c.Adresse as ClientAdresse, 
+            $query = "SELECT i.*, 
+                            u.Nom as ClientNom, 
+                            u.Prenom as ClientPrenom,
+                            c.Adresse as ClientAdresse,
                             c.Telephone as ClientTelephone
                      FROM Intervention i 
-                     INNER JOIN Client c ON i.ClientID = c.ClientID 
-                     WHERE i.TechnicienID = ?
+                     INNER JOIN Client c ON i.ClientID = c.ClientID
+                     INNER JOIN Utilisateur u ON c.UtilisateurID = u.UtilisateurID
+                     WHERE i.TechnicienID = (
+                         SELECT t.TechnicienID 
+                         FROM Technicien t 
+                         WHERE t.UtilisateurID = ?
+                     )
                      ORDER BY i.DebutIntervention ASC";
-
+    
             $stmt = $this->conn->prepare($query);
             if (!$stmt) {
                 throw new Exception("Erreur de préparation de la requête: " . $this->conn->error);
             }
-
+    
             $stmt->bind_param("i", $technicienId);
             
             if (!$stmt->execute()) {
                 throw new Exception("Erreur d'exécution de la requête: " . $stmt->error);
             }
-
+    
             $result = $stmt->get_result();
             $interventions = [];
-
+    
             while ($row = $result->fetch_assoc()) {
                 $interventions[] = [
                     'InterventionID' => $row['InterventionID'],
@@ -70,51 +78,12 @@ class TechnicienModel {
                     ]
                 ];
             }
-
+    
             $stmt->close();
             return $interventions;
-
+    
         } catch (Exception $e) {
             error_log("Erreur dans getInterventions: " . $e->getMessage());
-            throw $e;
-        }
-    }
-
-    public function creerTechnicien($data) {
-        try {
-            $stmt = $this->conn->prepare("INSERT INTO Technicien (UtilisateurID) VALUES (?)");
-            $stmt->bind_param('i', $data['UtilisateurID']);
-            $result = $stmt->execute();
-            $stmt->close();
-            return $result;
-        } catch (Exception $e) {
-            error_log("Erreur dans creerTechnicien: " . $e->getMessage());
-            throw $e;
-        }
-    }
-
-    public function modifierTechnicien($id, $data) {
-        try {
-            $stmt = $this->conn->prepare("UPDATE Technicien SET UtilisateurID = ? WHERE TechnicienID = ?");
-            $stmt->bind_param('ii', $data['UtilisateurID'], $id);
-            $result = $stmt->execute();
-            $stmt->close();
-            return $result;
-        } catch (Exception $e) {
-            error_log("Erreur dans modifierTechnicien: " . $e->getMessage());
-            throw $e;
-        }
-    }
-
-    public function supprimerTechnicien($id) {
-        try {
-            $stmt = $this->conn->prepare("DELETE FROM Technicien WHERE TechnicienID = ?");
-            $stmt->bind_param('i', $id);
-            $result = $stmt->execute();
-            $stmt->close();
-            return $result;
-        } catch (Exception $e) {
-            error_log("Erreur dans supprimerTechnicien: " . $e->getMessage());
             throw $e;
         }
     }
