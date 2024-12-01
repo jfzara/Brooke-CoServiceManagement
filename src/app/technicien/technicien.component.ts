@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { InterventionService } from '../services/intervention.service';
-import { AuthService } from '../services/auth.service';
+import { InterventionService } from '../core/services/intervention.service';
+import { AuthService } from '../core/services/auth.service';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -11,6 +11,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import frLocale from '@fullcalendar/core/locales/fr';
 import { Intervention, STATUS_TYPES, getStatusColor } from '../models/intervention.model';
 import { UserProfile } from '../models/user.model';
+import { ApiResponse } from '../models/api.model';
 
 @Component({
   selector: 'app-technicien',
@@ -58,16 +59,16 @@ export class TechnicienComponent implements OnInit {
     this.userProfile = this.authService.userProfile;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadInterventions();
   }
 
-  logout() {
+  logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
 
-  private loadInterventions() {
+  private loadInterventions(): void {
     if (!this.userProfile?.technicienId) {
       this.error = 'Utilisateur non connecté ou non technicien';
       return;
@@ -78,7 +79,7 @@ export class TechnicienComponent implements OnInit {
 
     this.interventionService.getTechnicienInterventions(this.userProfile.technicienId)
       .subscribe({
-        next: (response) => {
+        next: (response: ApiResponse<Intervention[]>) => {
           if (response.status === 'success' && response.data) {
             this.interventions = response.data;
             this.updateFilteredInterventions();
@@ -86,18 +87,16 @@ export class TechnicienComponent implements OnInit {
           } else {
             this.error = response.message || 'Erreur lors du chargement des interventions';
           }
-        },
-        error: (error) => {
-          this.error = 'Erreur lors du chargement des interventions: ' + error;
           this.loading = false;
         },
-        complete: () => {
+        error: (error: Error) => {
+          this.error = 'Erreur lors du chargement des interventions: ' + error.message;
           this.loading = false;
         }
       });
   }
 
-  updateFilteredInterventions() {
+  updateFilteredInterventions(): void {
     this.filteredInterventions = this.interventions.filter(intervention => {
       const searchFields = [
         intervention.TypeIntervention,
@@ -119,38 +118,57 @@ export class TechnicienComponent implements OnInit {
     });
   }
 
-  onSearch(event: any) {
-    this.searchTerm = event.target.value;
+  onSearch(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.searchTerm = target.value;
     this.updateFilteredInterventions();
   }
 
-  onFilterChange(event: any) {
-    this.filterValue = event.target.value;
+  onFilterChange(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    this.filterValue = target.value;
     this.updateFilteredInterventions();
   }
 
-  startIntervention(intervention: Intervention) {
+  startIntervention(intervention: Intervention): void {
     if (confirm('Voulez-vous démarrer cette intervention ?')) {
-      intervention.StatutIntervention = STATUS_TYPES.IN_PROGRESS;
-      this.updateFilteredInterventions();
+      this.updateInterventionStatus(intervention, STATUS_TYPES.IN_PROGRESS);
     }
   }
 
-  completeIntervention(intervention: Intervention) {
+  completeIntervention(intervention: Intervention): void {
     if (confirm('Voulez-vous marquer cette intervention comme terminée ?')) {
-      intervention.StatutIntervention = STATUS_TYPES.COMPLETED;
-      this.updateFilteredInterventions();
+      this.updateInterventionStatus(intervention, STATUS_TYPES.COMPLETED);
     }
   }
 
-  cancelIntervention(intervention: Intervention) {
+  cancelIntervention(intervention: Intervention): void {
     if (confirm('Êtes-vous sûr de vouloir annuler cette intervention ?')) {
-      intervention.StatutIntervention = STATUS_TYPES.CANCELLED;
-      this.updateFilteredInterventions();
+      this.updateInterventionStatus(intervention, STATUS_TYPES.CANCELLED);
     }
   }
 
-  updateCalendarEvents() {
+  private updateInterventionStatus(intervention: Intervention, status: string): void {
+    if (intervention.InterventionID) {
+      this.interventionService.updateStatusIntervention(intervention.InterventionID, status)
+        .subscribe({
+          next: (response: ApiResponse<void>) => {
+            if (response.status === 'success') {
+              intervention.StatutIntervention = status;
+              this.updateFilteredInterventions();
+              this.updateCalendarEvents();
+            } else {
+              this.error = response.message || 'Erreur lors de la mise à jour du statut';
+            }
+          },
+          error: (error: Error) => {
+            this.error = 'Erreur lors de la mise à jour du statut: ' + error.message;
+          }
+        });
+    }
+  }
+
+  updateCalendarEvents(): void {
     this.calendarOptions.events = this.interventions
       .filter(intervention => new Date(intervention.DebutIntervention) >= new Date())
       .map(intervention => ({

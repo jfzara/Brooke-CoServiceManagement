@@ -1,5 +1,4 @@
 <?php
-
 require_once __DIR__ . '/../models/InterventionModel.php';
 
 class InterventionController {
@@ -9,63 +8,150 @@ class InterventionController {
         $this->interventionModel = new InterventionModel();
     }
 
+    public function getAllInterventions() {
+        try {
+            $interventions = $this->interventionModel->getAllInterventions();
+            return [
+                'status' => 'success',
+                'data' => $interventions,
+                'message' => 'Interventions récupérées avec succès'
+            ];
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
     public function createIntervention($data) {
-        if ($this->interventionModel->creerIntervention($data)) {
-            return "Intervention créée avec succès!";
-        } else {
-            return "Erreur lors de la création de l'intervention.";
+        try {
+            $result = $this->interventionModel->creerIntervention($data);
+            if ($result) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Intervention créée avec succès!'
+                ];
+            } else {
+                throw new Exception("Erreur lors de la création de l'intervention.");
+            }
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
         }
     }
 
     public function getIntervention($id) {
-        $result = $this->interventionModel->getInterventionById($id);
-        if ($result) {
-            return $result;
-        } else {
-            return "Intervention non trouvée.";
+        try {
+            $result = $this->interventionModel->getInterventionById($id);
+            if ($result) {
+                return [
+                    'status' => 'success',
+                    'data' => $result
+                ];
+            } else {
+                throw new Exception("Intervention non trouvée.");
+            }
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
         }
     }
 
     public function updateIntervention($id, $data) {
-        if ($this->interventionModel->modifierIntervention($id, $data)) {
-            return "Intervention mise à jour avec succès!";
-        } else {
-            return "Erreur lors de la mise à jour de l'intervention.";
+        try {
+            $result = $this->interventionModel->modifierIntervention($id, $data);
+            if ($result) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Intervention mise à jour avec succès!'
+                ];
+            } else {
+                throw new Exception("Erreur lors de la mise à jour de l'intervention.");
+            }
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
         }
     }
 
     public function deleteIntervention($id) {
-        if ($this->interventionModel->supprimerIntervention($id)) {
-            return "Intervention supprimée avec succès!";
-        } else {
-            return "Erreur lors de la suppression de l'intervention.";
+        try {
+            $result = $this->interventionModel->supprimerIntervention($id);
+            if ($result) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Intervention supprimée avec succès!'
+                ];
+            } else {
+                throw new Exception("Erreur lors de la suppression de l'intervention.");
+            }
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
         }
     }
-    
-    public function getAllInterventions() {
-        return $this->interventionModel->getAllInterventions();
-    }
 
-    // Méthode pour mettre à jour le statut d'une intervention avec gestion des heures
     public function updateStatut($id, $statut, $date = null, $heure = null, $description = null) {
-        // Appeler la méthode du modèle pour mettre à jour le statut, la date et l'heure
-        $result = $this->interventionModel->updateStatut($id, $statut, $date, $heure, $description);
-
-        if ($result) {
-            return "Statut de l'intervention mis à jour avec succès!";
-        } else {
-            return "Erreur lors de la mise à jour du statut de l'intervention ou transition invalide.";
+        try {
+            $result = $this->interventionModel->updateStatut($id, $statut, $date, $heure, $description);
+            if ($result) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Statut de l\'intervention mis à jour avec succès!'
+                ];
+            } else {
+                throw new Exception("Erreur lors de la mise à jour du statut de l'intervention.");
+            }
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
         }
     }
 
     public function getInterventionsByTechnicien($technicienId) {
-        $interventions = $this->interventionModel->getInterventionsByTechnicien($technicienId);
-        return [
-            'status' => 'success',
-            'data' => $interventions
-        ];
+        try {
+            $interventions = $this->interventionModel->getInterventionsByTechnicien($technicienId);
+            return [
+                'status' => 'success',
+                'data' => $interventions
+            ];
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
     }
 
+    public function assignerTechnicien($interventionId, $technicienId) {
+        try {
+            $result = $this->interventionModel->assignerTechnicien($interventionId, $technicienId);
+            if ($result) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Technicien assigné avec succès!'
+                ];
+            } else {
+                throw new Exception("Erreur lors de l'assignation du technicien.");
+            }
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
 }
-
 ?>
+

@@ -17,7 +17,20 @@ class InterventionModel {
     }
 
     public function getAllInterventions() {
-        $query = "SELECT * FROM Intervention";
+        $query = "SELECT i.*, 
+                         u_client.Nom as ClientNom, 
+                         u_client.Prenom as ClientPrenom,
+                         u_tech.Nom as TechnicienNom,
+                         u_tech.Prenom as TechnicienPrenom,
+                         c.Adresse as ClientAdresse,
+                         c.Telephone as ClientTelephone
+                  FROM Intervention i
+                  LEFT JOIN Client c ON i.ClientID = c.ClientID
+                  LEFT JOIN Utilisateur u_client ON c.UtilisateurID = u_client.UtilisateurID
+                  LEFT JOIN Technicien t ON i.TechnicienID = t.TechnicienID
+                  LEFT JOIN Utilisateur u_tech ON t.UtilisateurID = u_tech.UtilisateurID
+                  ORDER BY i.DebutIntervention DESC";
+        
         $result = $this->conn->query($query);
         $interventions = [];
         
@@ -31,10 +44,25 @@ class InterventionModel {
     }
 
     public function getInterventionById($id) {
-        $stmt = $this->conn->prepare("SELECT * FROM Intervention WHERE InterventionID = ?");
+        $query = "SELECT i.*, 
+                         u_client.Nom as ClientNom, 
+                         u_client.Prenom as ClientPrenom,
+                         u_tech.Nom as TechnicienNom,
+                         u_tech.Prenom as TechnicienPrenom,
+                         c.Adresse as ClientAdresse,
+                         c.Telephone as ClientTelephone
+                  FROM Intervention i
+                  LEFT JOIN Client c ON i.ClientID = c.ClientID
+                  LEFT JOIN Utilisateur u_client ON c.UtilisateurID = u_client.UtilisateurID
+                  LEFT JOIN Technicien t ON i.TechnicienID = t.TechnicienID
+                  LEFT JOIN Utilisateur u_tech ON t.UtilisateurID = u_tech.UtilisateurID
+                  WHERE i.InterventionID = ?";
+                  
+        $stmt = $this->conn->prepare($query);
         $stmt->bind_param('i', $id);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
+        
         if ($result) {
             $this->InterventionID = $result['InterventionID'];
             $this->TechnicienID = $result['TechnicienID'];
@@ -46,6 +74,7 @@ class InterventionModel {
             $this->StatutIntervention = $result['StatutIntervention'];
             $this->Commentaires = $result['Commentaires'];
         }
+        
         return $result;
     }
 
@@ -62,7 +91,7 @@ class InterventionModel {
             $data['Commentaires']
         );
         $stmt->execute();
-        return $stmt->affected_rows;
+        return $stmt->affected_rows > 0;
     }
 
     public function modifierIntervention($id, $data) {
@@ -79,14 +108,14 @@ class InterventionModel {
             $id
         );
         $stmt->execute();
-        return $stmt->affected_rows;
+        return $stmt->affected_rows > 0;
     }
 
     public function supprimerIntervention($id) {
         $stmt = $this->conn->prepare("DELETE FROM Intervention WHERE InterventionID = ?");
         $stmt->bind_param('i', $id);
         $stmt->execute();
-        return $stmt->affected_rows;
+        return $stmt->affected_rows > 0;
     }
 
     public function updateStatut($id, $statut, $date = null, $heure = null, $description = null) {
@@ -94,6 +123,7 @@ class InterventionModel {
         $stmt->bind_param('i', $id);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
+        
         if (!$result) {
             return false;
         }
@@ -140,17 +170,18 @@ class InterventionModel {
         $stmt->bind_param($types, ...$params);
         $stmt->execute();
         
-        if($stmt->affected_rows > 0 && $description !== null){
-            $planningTechnicienModel = new PlanningTechnicienModel();
-            return $planningTechnicienModel->updateCommentaire($description, $id);
-        }
         return $stmt->affected_rows > 0;
-    }   
-    
+    }
+
     public function getInterventionsByTechnicien($technicienId) {
-        $query = "SELECT i.*, c.Nom as ClientNom, c.Prenom as ClientPrenom 
+        $query = "SELECT i.*, 
+                         u_client.Nom as ClientNom, 
+                         u_client.Prenom as ClientPrenom,
+                         c.Adresse as ClientAdresse,
+                         c.Telephone as ClientTelephone
                   FROM Intervention i
                   LEFT JOIN Client c ON i.ClientID = c.ClientID
+                  LEFT JOIN Utilisateur u_client ON c.UtilisateurID = u_client.UtilisateurID
                   WHERE i.TechnicienID = ?
                   ORDER BY i.DebutIntervention ASC";
                   
@@ -167,6 +198,11 @@ class InterventionModel {
         return $interventions;
     }
 
-
+    public function assignerTechnicien($interventionId, $technicienId) {
+        $stmt = $this->conn->prepare("UPDATE Intervention SET TechnicienID = ? WHERE InterventionID = ?");
+        $stmt->bind_param('ii', $technicienId, $interventionId);
+        $stmt->execute();
+        return $stmt->affected_rows > 0;
+    }
 }
 ?>

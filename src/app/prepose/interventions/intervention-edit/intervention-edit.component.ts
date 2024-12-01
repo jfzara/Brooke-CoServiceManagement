@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { InterventionService } from '../../services/intervention.service';
-import { Intervention, STATUS_TYPES } from '../../models/intervention.model';
+import { InterventionService } from '../../../core/services/intervention.service';
+import { Intervention, STATUS_TYPES } from '../../../models/intervention.model';
+import { ApiResponse } from '../../../models/api.model';
 
 @Component({
   selector: 'app-intervention-edit',
@@ -45,7 +46,7 @@ export class InterventionEditComponent implements OnInit {
   loadIntervention(id: number) {
     this.loading = true;
     this.interventionService.getInterventionById(id).subscribe({
-      next: (response) => {
+      next: (response: ApiResponse<Intervention>) => {
         if (response.status === 'success' && response.data) {
           this.intervention = response.data;
           this.editForm.patchValue({
@@ -61,7 +62,7 @@ export class InterventionEditComponent implements OnInit {
         }
         this.loading = false;
       },
-      error: (error) => {
+      error: (error: Error) => {
         this.error = 'Erreur lors du chargement de l\'intervention';
         this.loading = false;
         console.error('Erreur:', error);
@@ -84,7 +85,7 @@ export class InterventionEditComponent implements OnInit {
       this.intervention.InterventionID,
       updatedIntervention
     ).subscribe({
-      next: (response) => {
+      next: (response: ApiResponse<void>) => {
         if (response.status === 'success') {
           this.router.navigate(['/planning']);
         } else {
@@ -92,7 +93,7 @@ export class InterventionEditComponent implements OnInit {
         }
         this.loading = false;
       },
-      error: (error) => {
+      error: (error: Error) => {
         this.error = 'Erreur lors de la mise à jour de l\'intervention';
         this.loading = false;
         console.error('Erreur:', error);

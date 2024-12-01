@@ -1,0 +1,104 @@
+<div class="interventions-container">
+    <div class="interventions-header">
+      <h2>Liste des Interventions</h2>
+      <button class="add-button" routerLink="../create">+ Nouvelle Intervention</button>
+    </div>
+  
+    <div class="filters">
+      <div class="search-container">
+        <input 
+          type="text" 
+          class="search-input"
+          placeholder="Rechercher une intervention..." 
+          (input)="onSearch($event)"
+        />
+      </div>
+      <div class="filter-container">
+        <select (change)="onFilterChange($event)" class="filter-select">
+          <option value="">Tous les statuts</option>
+          <option [value]="STATUS_TYPES.PENDING">{{STATUS_TYPES.PENDING}}</option>
+          <option [value]="STATUS_TYPES.IN_PROGRESS">{{STATUS_TYPES.IN_PROGRESS}}</option>
+          <option [value]="STATUS_TYPES.COMPLETED">{{STATUS_TYPES.COMPLETED}}</option>
+        </select>
+      </div>
+    </div>
+  
+    <div class="loading-message" *ngIf="loading">
+      Chargement des interventions...
+    </div>
+  
+    <div class="error-message" *ngIf="error">
+      {{error}}
+    </div>
+  
+    <div class="table-container" *ngIf="!loading && !error">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Client</th>
+            <th>Type</th>
+            <th>Date</th>
+            <th>Technicien</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let intervention of filteredInterventions">
+            <td>{{intervention.InterventionID}}</td>
+            <td>Client {{intervention.ClientID}}</td>
+            <td>{{intervention.TypeIntervention}}</td>
+            <td>{{intervention.DebutIntervention | date:'dd/MM/yyyy HH:mm'}}</td>
+            <td>{{intervention.TechnicienID || 'Non assigné'}}</td>
+            <td>
+              <span class="status" [ngClass]="{
+                'status-pending': intervention.StatutIntervention === STATUS_TYPES.PENDING,
+                'status-progress': intervention.StatutIntervention === STATUS_TYPES.IN_PROGRESS,
+                'status-completed': intervention.StatutIntervention === STATUS_TYPES.COMPLETED
+              }">
+                {{intervention.StatutIntervention}}
+              </span>
+            </td>
+            <td class="actions">
+              <button class="action-button edit-button" [routerLink]="['../edit', intervention.InterventionID]">
+                Modifier
+              </button>
+              <button 
+                class="action-button assign-button" 
+                *ngIf="!intervention.TechnicienID"
+                (click)="openAssignModal(intervention)"
+              >
+                Assigner
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Modal d'assignation -->
+  <div class="modal" *ngIf="showAssignModal">
+    <div class="modal-content">
+      <h3>Assigner un technicien</h3>
+      <div class="modal-body">
+        <select [(ngModel)]="selectedTechnicienId" class="form-control">
+          <option [ngValue]="null">Sélectionnez un technicien</option>
+          <option *ngFor="let technicien of techniciens" [value]="technicien.TechnicienID">
+            {{technicien.Nom}} {{technicien.Prenom}}
+          </option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="closeAssignModal()">Annuler</button>
+        <button 
+          class="btn btn-primary" 
+          (click)="assignerTechnicien()"
+          [disabled]="!selectedTechnicienId || loading"
+        >
+          {{loading ? 'Assignation...' : 'Assigner'}}
+        </button>
+      </div>
+    </div>
+  </div>

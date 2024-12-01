@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { InterventionService } from '../../services/intervention.service';
+import { InterventionService } from '../../core/services/intervention.service';
+import { AuthService } from '../../core/services/auth.service';
 import { Intervention, STATUS_TYPES } from '../../models/intervention.model';
-import { AuthService } from '../../services/auth.service';
+import { ApiResponse } from '../../models/api.model';
 
 @Component({
   selector: 'app-planning-technicien',
@@ -41,7 +42,7 @@ export class PlanningTechnicienComponent implements OnInit {
 
     this.interventionService.getTechnicienInterventions(currentUser.technicienId)
       .subscribe({
-        next: (response) => {
+        next: (response: ApiResponse<Intervention[]>) => {
           console.log('Réponse API:', response);
           if (response.status === 'success' && response.data) {
             this.interventions = response.data;
@@ -51,7 +52,7 @@ export class PlanningTechnicienComponent implements OnInit {
           }
           this.loading = false;
         },
-        error: (error) => {
+        error: (error: Error) => {
           console.error('Erreur:', error);
           this.error = 'Erreur lors du chargement des interventions';
           this.loading = false;
@@ -97,14 +98,14 @@ export class PlanningTechnicienComponent implements OnInit {
       if (intervention.InterventionID) {
         this.interventionService.deleteIntervention(intervention.InterventionID)
           .subscribe({
-            next: (response) => {
+            next: (response: ApiResponse<void>) => {
               if (response.status === 'success') {
                 this.loadInterventions();
               } else {
                 this.error = response.message || 'Erreur lors de l\'annulation';
               }
             },
-            error: (error) => {
+            error: (error: Error) => {
               console.error('Erreur lors de l\'annulation:', error);
               this.error = 'Erreur lors de l\'annulation de l\'intervention';
             }
@@ -117,14 +118,14 @@ export class PlanningTechnicienComponent implements OnInit {
     if (intervention.InterventionID) {
       this.interventionService.updateStatusIntervention(intervention.InterventionID, newStatus)
         .subscribe({
-          next: (response) => {
+          next: (response: ApiResponse<void>) => {
             if (response.status === 'success') {
               this.loadInterventions();
             } else {
               this.error = response.message || 'Erreur lors de la mise à jour du statut';
             }
           },
-          error: (error) => {
+          error: (error: Error) => {
             console.error('Erreur lors de la mise à jour du statut:', error);
             this.error = 'Erreur lors de la mise à jour du statut';
           }

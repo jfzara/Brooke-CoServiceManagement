@@ -1,0 +1,98 @@
+<div class="create-intervention-container">
+    <h2>Créer une nouvelle intervention</h2>
+  
+    <form (ngSubmit)="onSubmit()" #interventionForm="ngForm" class="intervention-form">
+      <div class="form-group">
+        <label for="clientId">Client ID*</label>
+        <input 
+          type="number" 
+          id="clientId"
+          name="clientId"
+          [(ngModel)]="intervention.ClientID"
+          required
+          class="form-control"
+        >
+      </div>
+  
+      <div class="form-group">
+        <label for="type">Type d'intervention*</label>
+        <select 
+          id="type"
+          name="type"
+          [(ngModel)]="intervention.TypeIntervention"
+          required
+          class="form-control"
+        >
+          <option value="">Sélectionnez un type</option>
+          <option value="Installation Fibre">Installation Fibre</option>
+          <option value="Dépannage Internet">Dépannage Internet</option>
+          <option value="Configuration WiFi">Configuration WiFi</option>
+          <option value="Installation TV">Installation TV</option>
+          <option value="Maintenance Box">Maintenance Box</option>
+        </select>
+      </div>
+  
+      <div class="form-group">
+        <label for="description">Description*</label>
+        <textarea 
+          id="description"
+          name="description"
+          [(ngModel)]="intervention.Description"
+          required
+          class="form-control"
+          rows="4"
+        ></textarea>
+      </div>
+  
+      <div class="form-row">
+        <div class="form-group">
+          <label for="startDate">Date et heure de début*</label>
+          <input 
+            type="datetime-local"
+            id="startDate"
+            name="startDate"
+            [(ngModel)]="intervention.DebutIntervention"
+            required
+            class="form-control"
+          >
+        </div>
+  
+        <div class="form-group">
+          <label for="endDate">Date et heure de fin*</label>
+          <input 
+            type="datetime-local"
+            id="endDate"
+            name="endDate"
+            [(ngModel)]="intervention.FinIntervention"
+            required
+            class="form-control"
+          >
+        </div>
+      </div>
+  
+      <div class="form-actions">
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          routerLink="/prepose/interventions"
+        >
+          Annuler
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          [disabled]="loading"
+        >
+          {{loading ? 'Création en cours...' : 'Créer l\'intervention'}}
+        </button>
+      </div>
+  
+      <div class="alert alert-danger" *ngIf="error">
+        {{error}}
+      </div>
+  
+      <div class="alert alert-success" *ngIf="success">
+        {{success}}
+      </div>
+    </form>
+  </div>

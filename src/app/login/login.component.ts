@@ -1,8 +1,10 @@
+// src/app/login/login.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UserService } from '../services/user.service';
+import { UserService } from '../core/services/user.service';
+import { LoginResponse } from '../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -37,7 +39,7 @@ export class LoginComponent {
     };
 
     this.userService.login(loginData).subscribe({
-      next: (response) => {
+      next: (response: LoginResponse) => {
         console.log('Réponse du serveur:', response);
         if (response.status === 'success' && response.result?.utilisateur) {
           const user = response.result.utilisateur;
@@ -67,7 +69,7 @@ export class LoginComponent {
         }
         this.loading = false;
       },
-      error: (error) => {
+      error: (error: Error) => {
         console.error('Erreur de connexion:', error);
         this.errorMessage = error.message || 'Une erreur est survenue lors de la connexion';
         this.loading = false;
@@ -77,12 +79,12 @@ export class LoginComponent {
 
   loginFacebook(): void {
     this.userService.loginWithFacebook()
-      .then(authResponse => {
+      .then((authResponse: { accessToken: string }) => {
         console.log('Réponse de Facebook:', authResponse);
         const accessToken = authResponse.accessToken;
         
         this.userService.loginWithFacebookToken(accessToken).subscribe({
-          next: (response) => {
+          next: (response: LoginResponse) => {
             console.log('Connexion Facebook réussie:', response);
             if (response.status === 'success' && response.result?.utilisateur) {
               const user = response.result.utilisateur;
@@ -105,13 +107,13 @@ export class LoginComponent {
               this.errorMessage = response.message || 'Erreur lors de la connexion avec Facebook';
             }
           },
-          error: (error) => {
+          error: (error: Error) => {
             console.error('Erreur de connexion Facebook:', error);
             this.errorMessage = 'Erreur lors de la connexion avec Facebook';
           }
         });
       })
-      .catch(error => {
+      .catch((error: Error) => {
         console.error('Erreur Facebook:', error);
         this.errorMessage = 'Erreur lors de la connexion avec Facebook';
       });
