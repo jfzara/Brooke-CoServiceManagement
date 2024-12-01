@@ -123,4 +123,20 @@ export class InterventionService {
       })
     );
   }
+
+  notifyTechnicien(interventionId: number, technicienId: number): Observable<ApiResponse<void>> {
+    return this.http.post<ApiResponse<void>>(
+      `${this.apiUrl}?action=notify_technicien`,
+      { interventionId, technicienId }
+    ).pipe(
+      tap(response => console.log('Notification envoyée:', response)),
+      catchError(error => {
+        console.error('Erreur notification:', error);
+        throw error;
+      })
+    );
+  }
+
+
+
 }

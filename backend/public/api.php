@@ -16,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 require_once '../app/controllers/UtilisateurController.php';
 require_once '../app/controllers/TechnicienController.php';
+require_once '../app/controllers/InterventionController.php';
 
 try {
     error_log("Nouvelle requête - Méthode: " . $_SERVER['REQUEST_METHOD'] . ", Action: " . ($_GET['action'] ?? 'non définie'));
@@ -31,6 +32,7 @@ try {
             handlePostRequest($action);
             break;
         default:
+            error_log("Méthode non autorisée: " . $requestMethod);
             sendJsonResponse(['status' => 'error', 'message' => 'Méthode non autorisée'], 405);
     }
 } catch (Exception $e) {
@@ -40,9 +42,26 @@ try {
 
 function handleGetRequest($action) {
     try {
+        error_log("Traitement requête GET - Action: " . $action);
+        
         switch ($action) {
+            case 'get_all_interventions':
+                error_log("Récupération de toutes les interventions");
+                $interventionController = new InterventionController();
+                $response = $interventionController->getAllInterventions();
+                sendJsonResponse($response);
+                break;
+
+            case 'get_all_techniciens':
+                error_log("Récupération de tous les techniciens");
+                $technicienController = new TechnicienController();
+                $response = $technicienController->getAllTechniciens();
+                sendJsonResponse($response);
+                break;
+
             case 'get_technicien_interventions':
                 if (!isset($_GET['technicienId'])) {
+                    error_log("Erreur: ID du technicien manquant");
                     sendJsonResponse([
                         'status' => 'error',
                         'message' => 'ID du technicien manquant'
@@ -61,6 +80,7 @@ function handleGetRequest($action) {
                 break;
 
             default:
+                error_log("Action GET non reconnue: " . $action);
                 sendJsonResponse([
                     'status' => 'error',
                     'message' => 'Action non reconnue'
@@ -74,11 +94,33 @@ function handleGetRequest($action) {
 
 function handlePostRequest($action) {
     try {
+        error_log("Traitement requête POST - Action: " . $action);
+        $input = json_decode(file_get_contents("php://input"), true);
+        error_log("Données POST reçues: " . json_encode($input));
+
         switch ($action) {
-            case 'login':
-                $input = json_decode(file_get_contents("php://input"), true);
-                error_log("Données de login reçues: " . json_encode($input));
+            case 'create_intervention':
+                error_log("Création d'une nouvelle intervention");
+                error_log("Données reçues pour création intervention: " . json_encode($input));
+
+                if (!validateInterventionData($input)) {
+                    error_log("Données d'intervention invalides");
+                    sendJsonResponse([
+                        'status' => 'error',
+                        'message' => 'Données d\'intervention invalides ou incomplètes'
+                    ], 400);
+                    return;
+                }
+
+                $interventionController = new InterventionController();
+                $response = $interventionController->createIntervention($input);
                 
+                error_log("Réponse création intervention: " . json_encode($response));
+                sendJsonResponse($response);
+                break;
+
+            case 'login':
+                error_log("Tentative de connexion");
                 if (!isset($input['email']) || !isset($input['motDePasse'])) {
                     error_log("Données de login incomplètes");
                     sendJsonResponse([
@@ -91,14 +133,14 @@ function handlePostRequest($action) {
                 $utilisateurController = new UtilisateurController();
                 $response = $utilisateurController->connexion($input['email'], $input['motDePasse']);
                 
-                error_log("Réponse du contrôleur: " . json_encode($response));
+                error_log("Réponse connexion: " . json_encode($response));
                 
                 $httpCode = $response['status'] === 'success' ? 200 : 401;
                 sendJsonResponse($response, $httpCode);
                 break;
 
             default:
-                error_log("Action non reconnue: " . $action);
+                error_log("Action POST non reconnue: " . $action);
                 sendJsonResponse([
                     'status' => 'error',
                     'message' => 'Action non reconnue'
@@ -108,6 +150,20 @@ function handlePostRequest($action) {
         error_log("Exception dans handlePostRequest: " . $e->getMessage());
         throw $e;
     }
+}
+
+function validateInterventionData($data) {
+    $required = ['TypeIntervention', 'Description', 'DebutIntervention', 
+                 'FinIntervention', 'ClientID'];
+    
+    foreach ($required as $field) {
+        if (!isset($data[$field]) || empty($data[$field])) {
+            error_log("Champ manquant ou vide: " . $field);
+            return false;
+        }
+    }
+    
+    return true;
 }
 
 function sendJsonResponse($data, $httpCode = 200) {

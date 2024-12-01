@@ -12,8 +12,12 @@ class InterventionModel {
     public $Commentaires;
 
     public function __construct() {
-        global $conn;
+        require_once __DIR__ . '/../../config/database.php';
         $this->conn = $conn;
+        if (!$this->conn) {
+            error_log("Erreur: Connexion à la base de données non établie dans InterventionModel");
+            throw new Exception("Erreur de connexion à la base de données");
+        }
     }
 
     public function getAllInterventions() {
