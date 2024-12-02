@@ -1,96 +1,92 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { RouterModule, Router } from '@angular/router';
 import { InterventionService } from '../../../core/services/intervention.service';
-import { ApiResponse } from '../../../models/api.model';
-import { Intervention, STATUS_TYPES } from '../../../models/intervention.model';
+import { Intervention } from '../../../models/intervention.model';
 import { TechnicienSelectorComponent } from '../technicien-selector/technicien-selector.component';
 
 @Component({
   selector: 'app-intervention-create',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    RouterModule,
-    TechnicienSelectorComponent
-  ],
   templateUrl: './intervention-create.component.html',
-  styleUrls: ['./intervention-create.component.css']
+  styleUrls: ['./intervention-create.component.css'],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, TechnicienSelectorComponent]
 })
-export class InterventionCreateComponent {
-  intervention: Partial<Intervention> = {
-    TypeIntervention: '',
-    Description: '',
-    DebutIntervention: '',
-    FinIntervention: '',
-    StatutIntervention: STATUS_TYPES.PENDING,
-    ClientID: undefined,
-    TechnicienID: undefined
-  };
-
+export class InterventionCreateComponent implements OnInit {
+  interventionForm: FormGroup;
   loading = false;
-  error = '';
-  success = '';
+  error: string | null = null;
+  successMessage: string | null = null;
+  selectedTechnicienId: number | null = null;
 
   constructor(
+    private fb: FormBuilder,
     private interventionService: InterventionService,
     private router: Router
   ) {
-    console.log('InterventionCreateComponent initialisé');
+    this.interventionForm = this.fb.group({
+      TypeIntervention: ['', [Validators.required]],
+      Description: ['', [Validators.required]],
+      DebutIntervention: ['', [Validators.required]],
+      FinIntervention: ['', [Validators.required]],
+      ClientID: ['', [Validators.required]],
+      TechnicienID: [null, [Validators.required]],
+      StatutIntervention: ['planifiee'],
+      Commentaires: ['']
+    });
   }
 
-  onSubmit(): void {
-    console.log('Début de la soumission du formulaire');
-    console.log('Données de l\'intervention à créer:', this.intervention);
+  ngOnInit(): void {}
 
-    this.loading = true;
-    this.error = '';
-    this.success = '';
-
-    if (!this.intervention.TypeIntervention || !this.intervention.Description || 
-        !this.intervention.DebutIntervention || !this.intervention.FinIntervention || 
-        !this.intervention.ClientID) {
-      console.error('Validation échouée - Champs manquants:', {
-        typeIntervention: !this.intervention.TypeIntervention,
-        description: !this.intervention.Description,
-        debutIntervention: !this.intervention.DebutIntervention,
-        finIntervention: !this.intervention.FinIntervention,
-        clientId: !this.intervention.ClientID
-      });
-      this.error = 'Veuillez remplir tous les champs obligatoires';
-      this.loading = false;
-      return;
+  onDateChange(): void {
+    const debut = this.interventionForm.get('DebutIntervention')?.value;
+    const fin = this.interventionForm.get('FinIntervention')?.value;
+    
+    if (debut && fin && new Date(fin) < new Date(debut)) {
+      this.interventionForm.get('FinIntervention')?.setErrors({ 'dateInvalide': true });
     }
-
-    console.log('Validation réussie, envoi à InterventionService');
-
-    this.interventionService.createIntervention(this.intervention).subscribe({
-      next: (response: ApiResponse<void>) => {
-        console.log('Réponse du serveur:', response);
-        if (response.status === 'success') {
-          console.log('Création réussie, redirection dans 1.5s');
-          this.success = 'Intervention créée avec succès';
-          setTimeout(() => {
-            this.router.navigate(['/prepose/interventions']);
-          }, 1500);
-        } else {
-          console.error('Erreur serveur:', response.message);
-          this.error = response.message || 'Erreur lors de la création de l\'intervention';
-        }
-        this.loading = false;
-      },
-      error: (error: Error) => {
-        console.error('Erreur technique:', error);
-        this.error = 'Erreur lors de la création de l\'intervention: ' + error.message;
-        this.loading = false;
-      }
-    });
   }
 
   onTechnicienSelected(technicienId: number): void {
     console.log('Technicien sélectionné:', technicienId);
-    this.intervention.TechnicienID = technicienId;
+    this.selectedTechnicienId = technicienId;
+    this.interventionForm.patchValue({
+      TechnicienID: technicienId
+    });
+  }
+
+  onSubmit(): void {
+    if (this.interventionForm.valid) {
+      this.loading = true;
+      this.error = null;
+      this.successMessage = null;
+
+      const intervention: Intervention = {
+        ...this.interventionForm.value,
+        DateCreation: new Date().toISOString()
+      };
+      
+      console.log('Envoi de l\'intervention:', intervention);
+
+      this.interventionService.createIntervention(intervention).subscribe({
+        next: (response) => {
+          console.log('Réponse création:', response);
+          this.loading = false;
+          this.successMessage = 'Intervention créée avec succès';
+          setTimeout(() => {
+            this.router.navigate(['/prepose/interventions']);
+          }, 2000);
+        },
+        error: (err) => {
+          console.error('Erreur création:', err);
+          this.loading = false;
+          this.error = 'Erreur lors de la création de l\'intervention: ' + (err.message || err);
+        }
+      });
+    } else {
+      this.error = 'Veuillez remplir tous les champs obligatoires';
+      console.log('Formulaire invalide:', this.interventionForm.errors);
+    }
   }
 }

@@ -1,98 +1,107 @@
-<div class="create-intervention-container">
-    <h2>Créer une nouvelle intervention</h2>
-  
-    <form (ngSubmit)="onSubmit()" #interventionForm="ngForm" class="intervention-form">
-      <div class="form-group">
-        <label for="clientId">Client ID*</label>
-        <input 
-          type="number" 
-          id="clientId"
-          name="clientId"
-          [(ngModel)]="intervention.ClientID"
-          required
-          class="form-control"
-        >
+<div class="container mt-4">
+  <h2>Créer une nouvelle intervention</h2>
+
+  <form [formGroup]="interventionForm" (ngSubmit)="onSubmit()" class="mt-4">
+    <div class="mb-3">
+      <label for="TypeIntervention" class="form-label">Type d'intervention</label>
+      <select 
+        class="form-select" 
+        id="TypeIntervention" 
+        formControlName="TypeIntervention"
+        [class.is-invalid]="interventionForm.get('TypeIntervention')?.invalid && interventionForm.get('TypeIntervention')?.touched">
+        <option value="">Sélectionner un type</option>
+        <option value="installation">Installation</option>
+        <option value="depannage">Dépannage</option>
+        <option value="maintenance">Maintenance</option>
+      </select>
+      <div class="invalid-feedback">
+        Le type d'intervention est requis
       </div>
-  
-      <div class="form-group">
-        <label for="type">Type d'intervention*</label>
-        <select 
-          id="type"
-          name="type"
-          [(ngModel)]="intervention.TypeIntervention"
-          required
-          class="form-control"
-        >
-          <option value="">Sélectionnez un type</option>
-          <option value="Installation Fibre">Installation Fibre</option>
-          <option value="Dépannage Internet">Dépannage Internet</option>
-          <option value="Configuration WiFi">Configuration WiFi</option>
-          <option value="Installation TV">Installation TV</option>
-          <option value="Maintenance Box">Maintenance Box</option>
-        </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="Description" class="form-label">Description</label>
+      <textarea 
+        class="form-control" 
+        id="Description" 
+        formControlName="Description"
+        rows="3"
+        [class.is-invalid]="interventionForm.get('Description')?.invalid && interventionForm.get('Description')?.touched">
+      </textarea>
+      <div class="invalid-feedback">
+        La description est requise
       </div>
-  
-      <div class="form-group">
-        <label for="description">Description*</label>
-        <textarea 
-          id="description"
-          name="description"
-          [(ngModel)]="intervention.Description"
-          required
-          class="form-control"
-          rows="4"
-        ></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label for="DebutIntervention" class="form-label">Date de début</label>
+      <input 
+        type="datetime-local" 
+        class="form-control" 
+        id="DebutIntervention" 
+        formControlName="DebutIntervention"
+        (change)="onDateChange()"
+        [class.is-invalid]="interventionForm.get('DebutIntervention')?.invalid && interventionForm.get('DebutIntervention')?.touched">
+      <div class="invalid-feedback">
+        La date de début est requise
       </div>
-  
-      <div class="form-row">
-        <div class="form-group">
-          <label for="startDate">Date et heure de début*</label>
-          <input 
-            type="datetime-local"
-            id="startDate"
-            name="startDate"
-            [(ngModel)]="intervention.DebutIntervention"
-            required
-            class="form-control"
-          >
-        </div>
-  
-        <div class="form-group">
-          <label for="endDate">Date et heure de fin*</label>
-          <input 
-            type="datetime-local"
-            id="endDate"
-            name="endDate"
-            [(ngModel)]="intervention.FinIntervention"
-            required
-            class="form-control"
-          >
-        </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="FinIntervention" class="form-label">Date de fin</label>
+      <input 
+        type="datetime-local" 
+        class="form-control" 
+        id="FinIntervention" 
+        formControlName="FinIntervention"
+        (change)="onDateChange()"
+        [class.is-invalid]="interventionForm.get('FinIntervention')?.invalid && interventionForm.get('FinIntervention')?.touched">
+      <div class="invalid-feedback">
+        La date de fin est requise
       </div>
-  
-      <div class="form-actions">
-        <button 
-          type="button" 
-          class="btn btn-secondary" 
-          routerLink="/prepose/interventions"
-        >
-          Annuler
-        </button>
-        <button 
-          type="submit" 
-          class="btn btn-primary"
-          [disabled]="loading"
-        >
-          {{loading ? 'Création en cours...' : 'Créer l\'intervention'}}
-        </button>
+    </div>
+
+    <div class="mb-3">
+      <label for="ClientID" class="form-label">ID Client</label>
+      <input 
+        type="number" 
+        class="form-control" 
+        id="ClientID" 
+        formControlName="ClientID"
+        [class.is-invalid]="interventionForm.get('ClientID')?.invalid && interventionForm.get('ClientID')?.touched">
+      <div class="invalid-feedback">
+        L'ID client est requis
       </div>
-  
-      <div class="alert alert-danger" *ngIf="error">
-        {{error}}
-      </div>
-  
-      <div class="alert alert-success" *ngIf="success">
-        {{success}}
-      </div>
-    </form>
-  </div>
+    </div>
+
+    <app-technicien-selector
+      [selectedTechnicienId]="selectedTechnicienId"
+      (technicienSelected)="onTechnicienSelected($event)">
+    </app-technicien-selector>
+
+    <div class="mb-3">
+      <label for="Commentaires" class="form-label">Commentaires</label>
+      <textarea 
+        class="form-control" 
+        id="Commentaires" 
+        formControlName="Commentaires"
+        rows="2">
+      </textarea>
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger mt-3">
+      {{ error }}
+    </div>
+
+    <div *ngIf="successMessage" class="alert alert-success mt-3">
+      {{ successMessage }}
+    </div>
+
+    <button 
+      type="submit" 
+      class="btn btn-primary mt-3"
+      [disabled]="!interventionForm.valid || loading">
+      {{ loading ? 'Création en cours...' : 'Créer l\'intervention' }}
+    </button>
+  </form>
+</div>

@@ -6,28 +6,124 @@ class TechnicienController {
         try {
             $this->conn = new mysqli('localhost', 'root', '', 'brookeandco');
             if ($this->conn->connect_error) {
-                error_log("Erreur de connexion MySQL: " . $this->conn->connect_error);
                 throw new Exception("Erreur de connexion à la base de données");
             }
-            error_log("Connexion à la base de données réussie dans TechnicienController");
         } catch (Exception $e) {
-            error_log("Exception dans le constructeur TechnicienController: " . $e->getMessage());
             throw $e;
+        }
+    }
+
+    public function getAllTechniciens() {
+        try {
+            // Jointure avec la table Utilisateur pour récupérer les informations
+            $sql = "SELECT t.TechnicienID, t.UtilisateurID, 
+                           u.Nom, u.Prenom, u.Email 
+                    FROM Technicien t
+                    INNER JOIN Utilisateur u ON t.UtilisateurID = u.UtilisateurID 
+                    ORDER BY u.Nom, u.Prenom";
+            
+            $stmt = $this->conn->prepare($sql);
+            if (!$stmt) {
+                throw new Exception("Erreur lors de la préparation de la requête");
+            }
+            
+            if (!$stmt->execute()) {
+                throw new Exception("Erreur lors de l'exécution de la requête");
+            }
+
+            $result = $stmt->get_result();
+            $techniciens = [];
+            
+            while ($row = $result->fetch_assoc()) {
+                $techniciens[] = [
+                    'TechnicienID' => $row['TechnicienID'],
+                    'UtilisateurID' => $row['UtilisateurID'],
+                    'Nom' => $row['Nom'],
+                    'Prenom' => $row['Prenom'],
+                    'Email' => $row['Email']
+                ];
+            }
+
+            $stmt->close();
+
+            return [
+                'status' => 'success',
+                'data' => $techniciens,
+                'message' => count($techniciens) . ' technicien(s) trouvé(s)'
+            ];
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => 'Erreur lors de la récupération des techniciens: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    public function getTechniciensDisponibles($dateDebut, $dateFin) {
+        try {
+            $sql = "SELECT DISTINCT t.TechnicienID, t.UtilisateurID,
+                           u.Nom, u.Prenom, u.Email 
+                    FROM Technicien t
+                    INNER JOIN Utilisateur u ON t.UtilisateurID = u.UtilisateurID 
+                    WHERE NOT EXISTS (
+                        SELECT 1 
+                        FROM Intervention i 
+                        WHERE i.TechnicienID = t.TechnicienID 
+                        AND (
+                            (i.DebutIntervention BETWEEN ? AND ?)
+                            OR (i.FinIntervention BETWEEN ? AND ?)
+                            OR (? BETWEEN i.DebutIntervention AND i.FinIntervention)
+                        )
+                    )
+                    ORDER BY u.Nom, u.Prenom";
+    
+            $stmt = $this->conn->prepare($sql);
+            if (!$stmt) {
+                throw new Exception("Erreur lors de la préparation de la requête");
+            }
+    
+            $stmt->bind_param("sssss", $dateDebut, $dateFin, $dateDebut, $dateFin, $dateDebut);
+            
+            if (!$stmt->execute()) {
+                throw new Exception("Erreur lors de l'exécution de la requête");
+            }
+    
+            $result = $stmt->get_result();
+            $techniciens = [];
+            
+            while ($row = $result->fetch_assoc()) {
+                $techniciens[] = [
+                    'TechnicienID' => $row['TechnicienID'],
+                    'UtilisateurID' => $row['UtilisateurID'],
+                    'Nom' => $row['Nom'],
+                    'Prenom' => $row['Prenom'],
+                    'Email' => $row['Email']
+                ];
+            }
+    
+            $stmt->close();
+    
+            return [
+                'status' => 'success',
+                'data' => $techniciens,
+                'message' => count($techniciens) . ' technicien(s) disponible(s)'
+            ];
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => 'Erreur lors de la récupération des techniciens disponibles: ' . $e->getMessage()
+            ];
         }
     }
 
     public function getTechnicienInterventions($technicienId) {
         try {
-            error_log("Début getTechnicienInterventions pour technicienId: " . $technicienId);
-            
-            // Vérifier d'abord si le technicien existe
             $checkTechnicien = $this->conn->prepare("SELECT TechnicienID FROM Technicien WHERE TechnicienID = ?");
             $checkTechnicien->bind_param("i", $technicienId);
             $checkTechnicien->execute();
             $techResult = $checkTechnicien->get_result();
             
             if ($techResult->num_rows === 0) {
-                error_log("Aucun technicien trouvé avec l'ID: " . $technicienId);
                 return [
                     'status' => 'error',
                     'message' => 'Technicien non trouvé',
@@ -42,23 +138,19 @@ class TechnicienController {
                         cl.Adresse as ClientAdresse,
                         cl.Telephone as ClientTelephone
                     FROM Intervention i
-                    LEFT JOIN Utilisateur c ON i.ClientID = c.UtilisateurID
-                    LEFT JOIN Client cl ON c.UtilisateurID = cl.UtilisateurID
+                    LEFT JOIN Client cl ON i.ClientID = cl.ClientID
+                    LEFT JOIN Utilisateur c ON cl.UtilisateurID = c.UtilisateurID
                     WHERE i.TechnicienID = ?
                     ORDER BY i.DebutIntervention DESC";
 
-            error_log("Requête SQL préparée: " . $sql);
-
             $stmt = $this->conn->prepare($sql);
             if (!$stmt) {
-                error_log("Erreur de préparation SQL: " . $this->conn->error);
                 throw new Exception("Erreur de préparation de la requête");
             }
 
             $stmt->bind_param("i", $technicienId);
             
             if (!$stmt->execute()) {
-                error_log("Erreur d'exécution SQL: " . $stmt->error);
                 throw new Exception("Erreur d'exécution de la requête");
             }
 
@@ -66,9 +158,7 @@ class TechnicienController {
             $interventions = [];
 
             while ($row = $result->fetch_assoc()) {
-                error_log("Intervention trouvée: " . json_encode($row));
-                
-                $intervention = [
+                $interventions[] = [
                     'InterventionID' => $row['InterventionID'],
                     'TechnicienID' => $row['TechnicienID'],
                     'ClientID' => $row['ClientID'],
@@ -85,13 +175,9 @@ class TechnicienController {
                         'Telephone' => $row['ClientTelephone']
                     ]
                 ];
-                $interventions[] = $intervention;
             }
 
             $stmt->close();
-
-            error_log("Nombre d'interventions trouvées: " . count($interventions));
-            error_log("Données des interventions: " . json_encode($interventions));
 
             return [
                 'status' => 'success',
@@ -100,7 +186,6 @@ class TechnicienController {
             ];
 
         } catch (Exception $e) {
-            error_log("Exception dans getTechnicienInterventions: " . $e->getMessage());
             return [
                 'status' => 'error',
                 'message' => $e->getMessage(),
