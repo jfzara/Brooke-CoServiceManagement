@@ -1,53 +1,96 @@
-import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { TechnicienDisponibiliteService } from '../../../core/services/technicien-disponibilite.service';
 import { TechnicienService } from '../../../core/services/technicien.service';
-import { Technicien } from '../../../models/technicien.model';
+import { Technicien, TechnicienDisponibilite } from '../../../models/technicien.model';
 import { ApiResponse } from '../../../models/api.model';
 
 @Component({
   selector: 'app-technicien-selector',
-  templateUrl: './technicien-selector.component.html',
-  styleUrls: ['./technicien-selector.component.css'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule, FormsModule],
+  template: `
+    <div class="technicien-selector">
+      <div class="form-group">
+        <label>Sélectionner un technicien disponible</label>
+        <select 
+          class="form-control" 
+          [(ngModel)]="selectedTechnicienId"
+          (ngModelChange)="onTechnicienSelected($event)"
+        >
+          <option [ngValue]="null">Sélectionnez un technicien</option>
+          <option *ngFor="let technicien of techniciens" 
+                  [value]="technicien.TechnicienID"
+                  [disabled]="!isTechnicienDisponible(technicien.TechnicienID)">
+            {{technicien.Nom}} {{technicien.Prenom}}
+          </option>
+        </select>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .technicien-selector {
+      margin: 1rem 0;
+    }
+    .form-control {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+  `]
 })
 export class TechnicienSelectorComponent implements OnInit {
-  @Input() selectedTechnicienId: number | null = null;
+  @Input() dateDebut?: string;
+  @Input() dateFin?: string;
   @Output() technicienSelected = new EventEmitter<number>();
-  
+
   techniciens: Technicien[] = [];
-  loading = false;
-  error: string | null = null;
+  techniciensDisponibles: TechnicienDisponibilite[] = [];
+  selectedTechnicienId: number | null = null;
 
-  constructor(private technicienService: TechnicienService) {}
+  constructor(
+    private technicienService: TechnicienService,
+    private disponibiliteService: TechnicienDisponibiliteService
+  ) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.loadTechniciens();
+    if (this.dateDebut && this.dateFin) {
+      this.loadTechniciensDisponibles();
+    }
   }
 
-  loadTechniciens(): void {
-    this.loading = true;
-    this.error = null;
-    
+  private loadTechniciens() {
     this.technicienService.getAllTechniciens().subscribe({
       next: (response: ApiResponse<Technicien[]>) => {
         if (response.status === 'success' && response.data) {
           this.techniciens = response.data;
         }
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = 'Erreur lors du chargement des techniciens';
-        this.loading = false;
-        console.error('Erreur:', err);
       }
     });
   }
 
-  onTechnicienSelect(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    const technicienId = parseInt(select.value, 10);
-    if (!isNaN(technicienId)) {
+  private loadTechniciensDisponibles() {
+    if (this.dateDebut && this.dateFin) {
+      this.disponibiliteService.getTechniciensDisponibles(this.dateDebut, this.dateFin)
+        .subscribe({
+          next: (response: ApiResponse<TechnicienDisponibilite[]>) => {
+            if (response.status === 'success' && response.data) {
+              this.techniciensDisponibles = response.data;
+            }
+          }
+        });
+    }
+  }
+
+  isTechnicienDisponible(technicienId: number): boolean {
+    return this.techniciensDisponibles.some(t => t.TechnicienID === technicienId && t.disponible);
+  }
+
+  onTechnicienSelected(technicienId: number | null) {
+    if (technicienId) {
       this.technicienSelected.emit(technicienId);
     }
   }
