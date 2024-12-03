@@ -96,13 +96,25 @@ export class AuthService {
     localStorage.removeItem('currentUser');
     localStorage.removeItem('token');
     this.currentUserSubject.next(null);
+    window.location.href = '/login'; // Ajout de cette ligne pour forcer la redirection
   }
 
   isAuthenticated(): boolean {
-    return !!this.currentUserValue;
+    const currentUser = this.currentUserValue;
+    return currentUser !== null && currentUser.Type !== undefined;
   }
 
   hasRole(role: string): boolean {
-    return this.currentUserValue?.Type?.toLowerCase() === role.toLowerCase();
+    const currentUser = this.currentUserValue;
+    return currentUser?.Type?.toLowerCase() === role.toLowerCase();
+  }
+
+  checkAuthentication(): boolean {
+    const currentUser = this.currentUserValue;
+    if (!currentUser) {
+      window.location.href = '/login';
+      return false;
+    }
+    return true;
   }
 }

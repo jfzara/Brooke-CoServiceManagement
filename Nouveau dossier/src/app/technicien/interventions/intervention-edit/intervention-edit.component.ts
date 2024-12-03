@@ -1,9 +1,9 @@
-// src/app/technicien/interventions/intervention-edit/intervention-edit.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { InterventionService } from '@app/core/services/intervention.service';
+import { AuthService } from '@app/core/services/auth.service';
 import { Intervention, STATUS_TYPES } from '@app/models/intervention.model';
 import { ApiResponse } from '@app/models/api.model';
 
@@ -16,8 +16,52 @@ import { ApiResponse } from '@app/models/api.model';
       <h2>Modifier l'intervention</h2>
       <form [formGroup]="editForm" (ngSubmit)="onSubmit()" *ngIf="intervention">
         <div class="form-group">
+          <label for="type">Type d'intervention</label>
+          <input 
+            type="text" 
+            id="type" 
+            [value]="intervention.TypeIntervention" 
+            readonly 
+            class="readonly-field"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea 
+            id="description" 
+            [value]="intervention.Description"
+            readonly 
+            class="readonly-field"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="debut">Date et heure de début</label>
+          <input 
+            type="datetime-local" 
+            id="debut" 
+            [value]="formatDate(intervention.DebutIntervention)"
+            readonly 
+            class="readonly-field"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="fin">Date et heure de fin</label>
+          <input 
+            type="datetime-local" 
+            id="fin" 
+            [value]="formatDate(intervention.FinIntervention)"
+            readonly 
+            class="readonly-field"
+          >
+        </div>
+
+        <div class="form-group">
           <label for="status">Statut</label>
-          <select id="status" formControlName="StatutIntervention">
+          <select id="status" formControlName="StatutIntervention" required>
             <option *ngFor="let status of getStatusOptions()" [value]="status">
               {{status}}
             </option>
@@ -56,13 +100,23 @@ import { ApiResponse } from '@app/models/api.model';
     .form-group label {
       display: block;
       margin-bottom: 5px;
+      font-weight: 500;
     }
     .form-group select,
-    .form-group textarea {
+    .form-group textarea,
+    .form-group input {
       width: 100%;
       padding: 8px;
       border: 1px solid #ddd;
       border-radius: 4px;
+      font-size: 14px;
+    }
+    .readonly-field {
+      background-color: #f8f9fa;
+      cursor: not-allowed;
+    }
+    .form-group textarea {
+      resize: vertical;
     }
     .form-actions {
       display: flex;
@@ -70,9 +124,31 @@ import { ApiResponse } from '@app/models/api.model';
       justify-content: flex-end;
       margin-top: 20px;
     }
+    .form-actions button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .form-actions button[type="submit"] {
+      background-color: #007bff;
+      color: white;
+    }
+    .form-actions button[type="submit"]:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    .form-actions button[type="button"] {
+      background-color: #6c757d;
+      color: white;
+    }
     .error-message {
       color: #dc3545;
       margin-top: 10px;
+      padding: 10px;
+      background-color: #f8d7da;
+      border-radius: 4px;
     }
   `]
 })
@@ -87,7 +163,8 @@ export class InterventionEditComponent implements OnInit {
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private interventionService: InterventionService
+    private interventionService: InterventionService,
+    private authService: AuthService
   ) {
     this.editForm = this.formBuilder.group({
       StatutIntervention: ['', Validators.required],
@@ -96,6 +173,11 @@ export class InterventionEditComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadIntervention(parseInt(id, 10));
@@ -108,6 +190,15 @@ export class InterventionEditComponent implements OnInit {
       next: (response: ApiResponse<Intervention>) => {
         if (response.status === 'success' && response.data) {
           this.intervention = response.data;
+          
+          // Vérifier si l'intervention appartient au technicien connecté
+          const currentUser = this.authService.currentUserValue;
+          if (currentUser?.technicienId !== this.intervention.TechnicienID) {
+            this.error = 'Vous n\'êtes pas autorisé à modifier cette intervention';
+            this.router.navigate(['/technicien/interventions']);
+            return;
+          }
+
           this.editForm.patchValue({
             StatutIntervention: this.intervention.StatutIntervention,
             Commentaires: this.intervention.Commentaires || ''
@@ -133,7 +224,8 @@ export class InterventionEditComponent implements OnInit {
     this.loading = true;
     const updatedData: Partial<Intervention> = {
       ...this.intervention,
-      ...this.editForm.value
+      StatutIntervention: this.editForm.value.StatutIntervention,
+      Commentaires: this.editForm.value.Commentaires
     };
 
     this.interventionService.updateIntervention(
@@ -154,6 +246,10 @@ export class InterventionEditComponent implements OnInit {
         console.error('Erreur:', error);
       }
     });
+  }
+
+  formatDate(date: string | Date): string {
+    return new Date(date).toISOString().slice(0, 16);
   }
 
   getStatusOptions(): string[] {
